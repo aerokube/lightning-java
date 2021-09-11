@@ -11,8 +11,9 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <swagger.version>1.6.2</swagger.version>
-        <openapi-spec.version>1.0.0</openapi-spec.version>
+        <openapi-spec.version>1.0.4</openapi-spec.version>
         <openapi-plugin.version>5.1.0</openapi-plugin.version>
         <jackson.version>2.12.5</jackson.version>
     </properties>
@@ -71,6 +72,10 @@
                             <apiPackage>com.aerokube.lightning.api</apiPackage>
                             <inputSpec>https://github.com/aerokube/selenium-openapi/releases/download/${openapi-spec.version}/selenium.yaml</inputSpec>
                             <generatorName>java</generatorName>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <generateAliasAsModel>true</generateAliasAsModel>
+                            <enablePostProcessFile>true</enablePostProcessFile>
                             <library>native</library>
                             <configOptions>
                                 <dateLibrary>java8</dateLibrary>
