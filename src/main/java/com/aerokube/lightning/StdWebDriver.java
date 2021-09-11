@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Base64;
 import java.util.Map;

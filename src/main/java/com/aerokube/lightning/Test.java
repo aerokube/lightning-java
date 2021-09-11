@@ -1,13 +1,9 @@
 package com.aerokube.lightning;
 
 import java.io.IOException;
-import java.net.Authenticator;
-import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
-
-import static java.net.http.HttpClient.Version.HTTP_1_1;
 
 public class Test {
 
