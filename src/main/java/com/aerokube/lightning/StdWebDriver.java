@@ -8,10 +8,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 public class StdWebDriver implements WebDriver {
 
@@ -33,12 +35,19 @@ public class StdWebDriver implements WebDriver {
     private final WebDriver.Navigation navigation;
     private final WebDriver.Session session;
     private final WebDriver.Screenshot screenshot;
+    private final WebDriver.Timeouts timeouts;
 
     public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri) {
-        this(capabilities, baseUri, null);
+        this(
+                capabilities,
+                baseUri,
+                apiClient -> apiClient.setHttpClientBuilder(
+                        HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
+                )
+        );
     }
 
-    public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri, @Nullable Function<ApiClient, ApiClient> apiClientConfigurator) {
+    public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
         initApiClient(baseUri, apiClientConfigurator);
 
         this.sessionId = execute(() -> {
@@ -50,18 +59,14 @@ public class StdWebDriver implements WebDriver {
             return session.getValue().getSessionId();
         });
 
-
         this.navigation = new Navigation();
         this.session = new Session();
         this.screenshot = new Screenshot();
+        this.timeouts = new Timeouts();
     }
 
-    private void initApiClient(@Nullable String baseUri, @Nullable Function<ApiClient, ApiClient> apiClientConfigurator) {
-        if (apiClientConfigurator != null) {
-            apiClientConfigurator.apply(apiClient);
-        } else {
-            apiClient.setHttpClientBuilder(HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1));
-        }
+    private void initApiClient(@Nullable String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
+        apiClientConfigurator.accept(apiClient);
         if (baseUri != null) {
             if (baseUri.endsWith("/")) {
                 baseUri = baseUri.substring(0, baseUri.length() - 1);
@@ -124,6 +129,10 @@ public class StdWebDriver implements WebDriver {
         return session;
     }
 
+    public WebDriver.Timeouts timeouts() {
+        return timeouts;
+    }
+
     class Session implements WebDriver.Session {
 
         @Override
@@ -135,17 +144,18 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public SessionStatus status() {
+        public Status status() {
             return execute(() -> {
                 StatusResponseValue response = sessionsApi.getStatus().getValue();
-                return new SessionStatus() {
+                return new Status() {
                     @Override
-                    public boolean ready() {
+                    public boolean isReady() {
                         return response.getReady();
                     }
 
                     @Override
-                    public String message() {
+                    @Nonnull
+                    public String getMessage() {
                         return response.getMessage();
                     }
                 };
@@ -173,12 +183,13 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public String url() {
+        @Nonnull
+        public String getUrl() {
             return execute(() -> navigationApi.getCurrentUrl(sessionId).getValue());
         }
 
         @Override
-        public void navigate(String url) {
+        public void navigate(@Nonnull String url) {
             execute(() -> {
                 UrlRequest urlRequest = new UrlRequest();
                 urlRequest.setUrl(url);
@@ -196,7 +207,8 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public String title() {
+        @Nonnull
+        public String getTitle() {
             return execute(() -> navigationApi.getPageTitle(sessionId).getValue());
         }
 
@@ -212,6 +224,65 @@ public class StdWebDriver implements WebDriver {
             });
         }
 
+    }
+
+    class Timeouts implements WebDriver.Timeouts {
+
+        com.aerokube.lightning.model.Timeouts getTimeouts() {
+            return execute(() -> timeoutsApi.getTimeouts(sessionId).getValue());
+        }
+
+        void setTimeouts(com.aerokube.lightning.model.Timeouts timeouts) {
+            execute(() -> {
+                timeoutsApi.setTimeouts(sessionId, timeouts);
+                return null;
+            });
+        }
+
+        @Nonnull
+        @Override
+        public Duration getImplicitWaitTimeout() {
+            return Duration.ofMillis(getTimeouts().getImplicit());
+        }
+
+        @Override
+        public void setImplicitWaitTimeout(@Nonnull Duration value) {
+            setTimeouts(new com.aerokube.lightning.model.Timeouts() {
+                {
+                    setImplicit(value.toMillis());
+                }
+            });
+        }
+
+        @Nonnull
+        @Override
+        public Duration getPageLoadTimeout() {
+            return Duration.ofMillis(getTimeouts().getPageLoad());
+        }
+
+        @Override
+        public void setPageLoadTimeout(@Nonnull Duration value) {
+            setTimeouts(new com.aerokube.lightning.model.Timeouts() {
+                {
+                    setPageLoad(value.toMillis());
+                }
+            });
+        }
+
+        @Override
+        public Optional<Duration> getScriptTimeout() {
+            Long value = getTimeouts().getScript();
+            return value != null ? Optional.of(Duration.ofMillis(value)) : Optional.empty();
+        }
+
+        @Override
+        public void setScriptTimeout(@Nullable Duration value) {
+            setTimeouts(new com.aerokube.lightning.model.Timeouts() {
+                {
+                    setScript(value != null ? value.toMillis() : null);
+                }
+            });
+        }
     }
 
 }

@@ -1,7 +1,10 @@
 package com.aerokube.lightning;
 
 import javax.annotation.Nonnull;
-import java.util.function.Function;
+import javax.annotation.Nullable;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public interface WebDriver {
 
@@ -9,7 +12,7 @@ public interface WebDriver {
         return new StdWebDriver(capabilities, baseUri);
     }
 
-    static WebDriver create(@Nonnull Capabilities capabilities, @Nonnull String baseUri, @Nonnull Function<ApiClient, ApiClient> apiClientConfigurator) {
+    static WebDriver create(@Nonnull Capabilities capabilities, @Nonnull String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
         return new StdWebDriver(capabilities, baseUri, apiClientConfigurator);
     }
 
@@ -19,15 +22,24 @@ public interface WebDriver {
 
     Screenshot screenshot();
 
+    Timeouts timeouts();
+
     String getSessionId();
 
     interface Navigation {
         void back();
+
         void forward();
-        String url();
-        void navigate(String url);
+
+        @Nonnull
+        String getUrl();
+
+        void navigate(@Nonnull String url);
+
         void refresh();
-        String title();
+
+        @Nonnull
+        String getTitle();
     }
 
     interface Screenshot {
@@ -37,13 +49,32 @@ public interface WebDriver {
 
     interface Session {
 
-        interface SessionStatus {
-            boolean ready();
-            String message();
-        }
-
         void delete();
-        SessionStatus status();
+
+        Status status();
+
+        interface Status {
+            boolean isReady();
+
+            @Nonnull
+            String getMessage();
+        }
+    }
+
+    interface Timeouts {
+        @Nonnull
+        Duration getImplicitWaitTimeout();
+
+        void setImplicitWaitTimeout(@Nonnull Duration value);
+
+        @Nonnull
+        Duration getPageLoadTimeout();
+
+        void setPageLoadTimeout(@Nonnull Duration value);
+
+        Optional<Duration> getScriptTimeout();
+
+        void setScriptTimeout(@Nullable Duration value);
     }
 
 }
