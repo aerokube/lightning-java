@@ -1,7 +1,7 @@
 package com.aerokube.lightning;
 
 import javax.annotation.Nonnull;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public interface WebDriver {
 
@@ -9,8 +9,8 @@ public interface WebDriver {
         return new StdWebDriver(capabilities, baseUri);
     }
 
-    static WebDriver create(@Nonnull Capabilities capabilities, @Nonnull String baseUri, @Nonnull Supplier<ApiClient> apiClientSupplier) {
-        return new StdWebDriver(capabilities, baseUri, apiClientSupplier);
+    static WebDriver create(@Nonnull Capabilities capabilities, @Nonnull String baseUri, @Nonnull Function<ApiClient, ApiClient> apiClientConfigurator) {
+        return new StdWebDriver(capabilities, baseUri, apiClientConfigurator);
     }
 
     Session session();
@@ -22,15 +22,28 @@ public interface WebDriver {
     String getSessionId();
 
     interface Navigation {
+        void back();
+        void forward();
+        String url();
         void navigate(String url);
+        void refresh();
+        String title();
     }
 
     interface Screenshot {
         byte[] takeScreenshot();
+        //TODO: add element screenshot call
     }
 
     interface Session {
+
+        interface SessionStatus {
+            boolean ready();
+            String message();
+        }
+
         void delete();
+        SessionStatus status();
     }
 
 }

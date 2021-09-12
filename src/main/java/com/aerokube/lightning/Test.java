@@ -14,7 +14,7 @@ public class Test {
         WebDriver driver = WebDriver.create(
                 capabilities,
                 "http://localhost:4444/",
-                () -> new ApiClient().setReadTimeout(Duration.ofMinutes(5))
+                apiClient -> apiClient.setReadTimeout(Duration.ofMinutes(5))
         );
         System.out.printf("id = %s\n", driver.getSessionId());
 

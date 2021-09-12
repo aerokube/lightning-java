@@ -1,5 +1,7 @@
 package com.aerokube.lightning;
 
+import java.io.Serializable;
+
 import static com.aerokube.lightning.model.Capabilities.JSON_PROPERTY_BROWSER_NAME;
 
 public class Capabilities {
@@ -14,7 +16,7 @@ public class Capabilities {
         capabilities.put(JSON_PROPERTY_BROWSER_NAME, browserName);
     }
 
-    public void setCapability(String key, Object value) {
+    public void setCapability(String key, Serializable value) {
         capabilities.put(key, value);
     }
 

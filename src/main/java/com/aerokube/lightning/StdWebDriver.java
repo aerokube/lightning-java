@@ -11,22 +11,22 @@ import java.net.http.HttpClient;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class StdWebDriver implements WebDriver {
 
-    private final ApiClient apiClient;
+    private final ApiClient apiClient = new ApiClient();
 
-    private final ActionsApi actionsApi;
-    private final ContextsApi contextsApi;
-    private final CookiesApi cookiesApi;
-    private final DocumentApi documentApi;
-    private final ElementsApi elementsApi;
-    private final NavigationApi navigationApi;
-    private final PromptsApi promptsApi;
-    private final ScreenshotsApi screenshotsApi;
-    private final SessionsApi sessionsApi;
-    private final TimeoutsApi timeoutsApi;
+    private final ActionsApi actionsApi = new ActionsApi(apiClient);
+    private final ContextsApi contextsApi = new ContextsApi(apiClient);
+    private final CookiesApi cookiesApi = new CookiesApi(apiClient);
+    private final DocumentApi documentApi = new DocumentApi(apiClient);
+    private final ElementsApi elementsApi = new ElementsApi(apiClient);
+    private final NavigationApi navigationApi = new NavigationApi(apiClient);
+    private final PromptsApi promptsApi = new PromptsApi(apiClient);
+    private final ScreenshotsApi screenshotsApi = new ScreenshotsApi(apiClient);
+    private final SessionsApi sessionsApi = new SessionsApi(apiClient);
+    private final TimeoutsApi timeoutsApi = new TimeoutsApi(apiClient);
 
     private final String sessionId;
 
@@ -38,18 +38,8 @@ public class StdWebDriver implements WebDriver {
         this(capabilities, baseUri, null);
     }
 
-    public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri, @Nullable Supplier<ApiClient> apiClientSupplier) {
-        this.apiClient = initApiClient(baseUri, apiClientSupplier);
-        this.actionsApi = new ActionsApi(apiClient);
-        this.contextsApi = new ContextsApi(apiClient);
-        this.cookiesApi = new CookiesApi(apiClient);
-        this.documentApi = new DocumentApi(apiClient);
-        this.elementsApi = new ElementsApi(apiClient);
-        this.navigationApi = new NavigationApi(apiClient);
-        this.promptsApi = new PromptsApi(apiClient);
-        this.screenshotsApi = new ScreenshotsApi(apiClient);
-        this.sessionsApi = new SessionsApi(apiClient);
-        this.timeoutsApi = new TimeoutsApi(apiClient);
+    public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri, @Nullable Function<ApiClient, ApiClient> apiClientConfigurator) {
+        initApiClient(baseUri, apiClientConfigurator);
 
         this.sessionId = execute(() -> {
             NewSessionRequestCapabilities newSessionRequestCapabilities = new NewSessionRequestCapabilities()
@@ -66,17 +56,18 @@ public class StdWebDriver implements WebDriver {
         this.screenshot = new Screenshot();
     }
 
-    private ApiClient initApiClient(@Nullable String baseUri, @Nullable Supplier<ApiClient> apiClientSupplier) {
-        ApiClient apiClient = apiClientSupplier != null ?
-                apiClientSupplier.get() : new ApiClient();
-        apiClient.setHttpClientBuilder(HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1));
+    private void initApiClient(@Nullable String baseUri, @Nullable Function<ApiClient, ApiClient> apiClientConfigurator) {
+        if (apiClientConfigurator != null) {
+            apiClientConfigurator.apply(apiClient);
+        } else {
+            apiClient.setHttpClientBuilder(HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1));
+        }
         if (baseUri != null) {
             if (baseUri.endsWith("/")) {
                 baseUri = baseUri.substring(0, baseUri.length() - 1);
             }
             apiClient.updateBaseUri(baseUri);
         }
-        return apiClient;
     }
 
     private <T> T execute(Callable<T> action) {
@@ -135,6 +126,7 @@ public class StdWebDriver implements WebDriver {
 
     class Session implements WebDriver.Session {
 
+        @Override
         public void delete() {
             execute(() -> {
                 sessionsApi.deleteSession(sessionId);
@@ -142,10 +134,50 @@ public class StdWebDriver implements WebDriver {
             });
         }
 
+        @Override
+        public SessionStatus status() {
+            return execute(() -> {
+                StatusResponseValue response = sessionsApi.getStatus().getValue();
+                return new SessionStatus() {
+                    @Override
+                    public boolean ready() {
+                        return response.getReady();
+                    }
+
+                    @Override
+                    public String message() {
+                        return response.getMessage();
+                    }
+                };
+            });
+        }
+
     }
 
     class Navigation implements WebDriver.Navigation {
 
+        @Override
+        public void back() {
+            execute(() -> {
+                navigationApi.navigateBack(sessionId);
+                return null;
+            });
+        }
+
+        @Override
+        public void forward() {
+            execute(() -> {
+                navigationApi.navigateForward(sessionId);
+                return null;
+            });
+        }
+
+        @Override
+        public String url() {
+            return execute(() -> navigationApi.getCurrentUrl(sessionId).getValue());
+        }
+
+        @Override
         public void navigate(String url) {
             execute(() -> {
                 UrlRequest urlRequest = new UrlRequest();
@@ -155,10 +187,24 @@ public class StdWebDriver implements WebDriver {
             });
         }
 
+        @Override
+        public void refresh() {
+            execute(() -> {
+                navigationApi.refreshPage(sessionId);
+                return null;
+            });
+        }
+
+        @Override
+        public String title() {
+            return execute(() -> navigationApi.getPageTitle(sessionId).getValue());
+        }
+
     }
 
     class Screenshot implements WebDriver.Screenshot {
 
+        @Override
         public byte[] takeScreenshot() {
             return execute(() -> {
                 String encodedBytes = screenshotsApi.takeScreenshot(sessionId).getValue();
