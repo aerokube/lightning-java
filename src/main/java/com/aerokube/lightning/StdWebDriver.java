@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +33,9 @@ public class StdWebDriver implements WebDriver {
 
     private final String sessionId;
 
+    private final WebDriver.Document document;
     private final WebDriver.Navigation navigation;
+    private final WebDriver.Prompts prompts;
     private final WebDriver.Session session;
     private final WebDriver.Screenshot screenshot;
     private final WebDriver.Timeouts timeouts;
@@ -59,7 +62,9 @@ public class StdWebDriver implements WebDriver {
             return session.getValue().getSessionId();
         });
 
+        this.document = new Document();
         this.navigation = new Navigation();
+        this.prompts = new Prompts();
         this.session = new Session();
         this.screenshot = new Screenshot();
         this.timeouts = new Timeouts();
@@ -117,8 +122,16 @@ public class StdWebDriver implements WebDriver {
         return sessionId;
     }
 
+    public WebDriver.Document document() {
+        return document;
+    }
+
     public WebDriver.Navigation navigation() {
         return navigation;
+    }
+
+    public WebDriver.Prompts prompts() {
+        return prompts;
     }
 
     public WebDriver.Screenshot screenshot() {
@@ -131,6 +144,71 @@ public class StdWebDriver implements WebDriver {
 
     public WebDriver.Timeouts timeouts() {
         return timeouts;
+    }
+
+    class Document implements WebDriver.Document {
+
+        @Nonnull
+        @Override
+        public String getPageSource() {
+            return execute(() -> documentApi.getPageSource(sessionId).getValue());
+        }
+
+        @Nonnull
+        @Override
+        public String executeScript(@Nonnull String script, String... args) {
+            return execute(() -> {
+                ScriptRequest scriptRequest = new ScriptRequest()
+                        .script(script)
+                        .args(Arrays.asList(args));
+                return documentApi.executeScript(sessionId, scriptRequest).getValue();
+            });
+        }
+
+        @Nonnull
+        @Override
+        public String executeScriptAsync(@Nonnull String script, @Nonnull String... args) {
+            return execute(() -> {
+                ScriptRequest scriptRequest = new ScriptRequest()
+                        .script(script)
+                        .args(Arrays.asList(args));
+                return documentApi.executeScriptAsync(sessionId, scriptRequest).getValue();
+            });
+        }
+    }
+
+    class Prompts implements WebDriver.Prompts {
+
+        @Override
+        public void accept() {
+            execute(() -> {
+                promptsApi.acceptAlert(sessionId);
+                return null;
+            });
+        }
+
+        @Override
+        public void dismiss() {
+            execute(() -> {
+                promptsApi.dismissAlert(sessionId);
+                return null;
+            });
+        }
+
+        @Override
+        public @Nonnull
+        String getText(@Nonnull String text) {
+            return execute(() -> promptsApi.getAlertText(sessionId).getValue());
+        }
+
+        @Override
+        public void sendText(@Nonnull String text) {
+            execute(() -> {
+                SendAlertTextRequest sendAlertTextRequest = new SendAlertTextRequest().text(text);
+                promptsApi.sendAlertText(sessionId, sendAlertTextRequest);
+                return null;
+            });
+        }
     }
 
     class Session implements WebDriver.Session {
@@ -154,8 +232,8 @@ public class StdWebDriver implements WebDriver {
                     }
 
                     @Override
-                    @Nonnull
-                    public String getMessage() {
+                    public @Nonnull
+                    String getMessage() {
                         return response.getMessage();
                     }
                 };
@@ -182,8 +260,8 @@ public class StdWebDriver implements WebDriver {
             });
         }
 
-        @Override
         @Nonnull
+        @Override
         public String getUrl() {
             return execute(() -> navigationApi.getCurrentUrl(sessionId).getValue());
         }
@@ -191,8 +269,7 @@ public class StdWebDriver implements WebDriver {
         @Override
         public void navigate(@Nonnull String url) {
             execute(() -> {
-                UrlRequest urlRequest = new UrlRequest();
-                urlRequest.setUrl(url);
+                UrlRequest urlRequest = new UrlRequest().url(url);
                 navigationApi.navigateTo(sessionId, urlRequest);
                 return null;
             });
@@ -206,8 +283,8 @@ public class StdWebDriver implements WebDriver {
             });
         }
 
-        @Override
         @Nonnull
+        @Override
         public String getTitle() {
             return execute(() -> navigationApi.getPageTitle(sessionId).getValue());
         }

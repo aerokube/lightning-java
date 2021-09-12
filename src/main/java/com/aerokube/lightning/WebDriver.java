@@ -18,7 +18,12 @@ public interface WebDriver {
 
     Session session();
 
+    // TODO: add javadoc
+    Document document();
+
     Navigation navigation();
+
+    Prompts prompts();
 
     Screenshot screenshot();
 
@@ -26,10 +31,27 @@ public interface WebDriver {
 
     String getSessionId();
 
+    interface Document {
+
+        @Nonnull
+        String getPageSource();
+
+        @Nonnull
+        String executeScript(@Nonnull String script, String... args);
+
+        @Nonnull
+        String executeScriptAsync(@Nonnull String script, @Nonnull String... args);
+
+    }
+
     interface Navigation {
+
         void back();
 
         void forward();
+
+        @Nonnull
+        String getTitle();
 
         @Nonnull
         String getUrl();
@@ -38,8 +60,19 @@ public interface WebDriver {
 
         void refresh();
 
+    }
+
+    interface Prompts {
+
+        void accept();
+
+        void dismiss();
+
         @Nonnull
-        String getTitle();
+        String getText(@Nonnull String text);
+
+        void sendText(String text);
+
     }
 
     interface Screenshot {
