@@ -9,12 +9,10 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class StdWebDriver implements WebDriver {
 
@@ -142,8 +140,46 @@ public class StdWebDriver implements WebDriver {
         return session;
     }
 
+    @Override
+    public Cookies cookies() {
+        return new Cookies();
+    }
+
     public WebDriver.Timeouts timeouts() {
         return timeouts;
+    }
+
+    class Cookies implements WebDriver.Cookies {
+
+        @Override
+        public void add(@Nonnull Cookie cookie) {
+
+        }
+
+        @Override
+        public void delete(@Nonnull String name) {
+            execute(() -> cookiesApi.deleteCookie(sessionId, name));
+        }
+
+        @Override
+        public void deleteAll() {
+            execute(() -> cookiesApi.deleteAllCookies(sessionId));
+        }
+
+        @Override
+        public Cookie get(@Nonnull String name) {
+            return null;
+        }
+
+        @Nonnull
+        @Override
+        public List<Cookie> getAll() {
+            return execute(() -> cookiesApi.getAllCookies(sessionId).getValue())
+                    .stream()
+                    .map(com.aerokube.lightning.Cookie::new)
+                    .collect(Collectors.toList());
+        }
+
     }
 
     class Document implements WebDriver.Document {
@@ -181,18 +217,12 @@ public class StdWebDriver implements WebDriver {
 
         @Override
         public void accept() {
-            execute(() -> {
-                promptsApi.acceptAlert(sessionId);
-                return null;
-            });
+            execute(() -> promptsApi.acceptAlert(sessionId));
         }
 
         @Override
         public void dismiss() {
-            execute(() -> {
-                promptsApi.dismissAlert(sessionId);
-                return null;
-            });
+            execute(() -> promptsApi.dismissAlert(sessionId));
         }
 
         @Override
@@ -205,8 +235,7 @@ public class StdWebDriver implements WebDriver {
         public void sendText(@Nonnull String text) {
             execute(() -> {
                 SendAlertTextRequest sendAlertTextRequest = new SendAlertTextRequest().text(text);
-                promptsApi.sendAlertText(sessionId, sendAlertTextRequest);
-                return null;
+                return promptsApi.sendAlertText(sessionId, sendAlertTextRequest);
             });
         }
     }
@@ -215,10 +244,7 @@ public class StdWebDriver implements WebDriver {
 
         @Override
         public void delete() {
-            execute(() -> {
-                sessionsApi.deleteSession(sessionId);
-                return null;
-            });
+            execute(() -> sessionsApi.deleteSession(sessionId));
         }
 
         @Override
@@ -246,18 +272,12 @@ public class StdWebDriver implements WebDriver {
 
         @Override
         public void back() {
-            execute(() -> {
-                navigationApi.navigateBack(sessionId);
-                return null;
-            });
+            execute(() -> navigationApi.navigateBack(sessionId));
         }
 
         @Override
         public void forward() {
-            execute(() -> {
-                navigationApi.navigateForward(sessionId);
-                return null;
-            });
+            execute(() -> navigationApi.navigateForward(sessionId));
         }
 
         @Nonnull
@@ -270,17 +290,13 @@ public class StdWebDriver implements WebDriver {
         public void navigate(@Nonnull String url) {
             execute(() -> {
                 UrlRequest urlRequest = new UrlRequest().url(url);
-                navigationApi.navigateTo(sessionId, urlRequest);
-                return null;
+                return navigationApi.navigateTo(sessionId, urlRequest);
             });
         }
 
         @Override
         public void refresh() {
-            execute(() -> {
-                navigationApi.refreshPage(sessionId);
-                return null;
-            });
+            execute(() -> navigationApi.refreshPage(sessionId));
         }
 
         @Nonnull
@@ -310,10 +326,7 @@ public class StdWebDriver implements WebDriver {
         }
 
         void setTimeouts(com.aerokube.lightning.model.Timeouts timeouts) {
-            execute(() -> {
-                timeoutsApi.setTimeouts(sessionId, timeouts);
-                return null;
-            });
+            execute(() -> timeoutsApi.setTimeouts(sessionId, timeouts));
         }
 
         @Nonnull

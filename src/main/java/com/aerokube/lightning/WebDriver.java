@@ -3,6 +3,8 @@ package com.aerokube.lightning;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -18,6 +20,8 @@ public interface WebDriver {
 
     Session session();
 
+    Cookies cookies();
+
     // TODO: add javadoc
     Document document();
 
@@ -30,6 +34,65 @@ public interface WebDriver {
     Timeouts timeouts();
 
     String getSessionId();
+
+    interface Cookies {
+
+        void add(@Nonnull Cookie cookie);
+
+        void delete(@Nonnull String name);
+
+        void deleteAll();
+
+        Cookie get(@Nonnull String name);
+
+        @Nonnull
+        List<Cookie> getAll();
+
+        interface Cookie {
+
+            static CookieBuilder create(@Nonnull String name, @Nonnull String value) {
+                return new com.aerokube.lightning.Cookie.CookieBuilder(name, value);
+            }
+
+            @Nonnull
+            String getName();
+
+            @Nonnull
+            String getValue();
+
+            @Nonnull
+            String getPath();
+
+            @Nonnull
+            String getDomain();
+
+            boolean isSecureOnly();
+
+            boolean isHttpOnly();
+
+            Optional<Instant> getExpires();
+
+            com.aerokube.lightning.model.Cookie.SameSiteEnum getSameSitePolicy();
+        }
+
+        interface CookieBuilder {
+
+            CookieBuilder path(@Nonnull String path);
+
+            CookieBuilder domain(@Nonnull String domain);
+
+            CookieBuilder secureOnly(boolean secureOnly);
+
+            CookieBuilder httpOnly(boolean httpOnly);
+
+            CookieBuilder expires(@Nonnull Instant expires);
+
+            CookieBuilder sameSitePolicy(@Nonnull com.aerokube.lightning.model.Cookie.SameSiteEnum sameSitePolicy);
+
+            Cookie build();
+        }
+
+    }
 
     interface Document {
 
