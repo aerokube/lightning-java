@@ -12,6 +12,10 @@ public class Cookie implements WebDriver.Cookies.Cookie {
         this.cookie = cookie;
     }
 
+    com.aerokube.lightning.model.Cookie raw() {
+        return cookie;
+    }
+
     @Nonnull
     @Override
     public String getName() {

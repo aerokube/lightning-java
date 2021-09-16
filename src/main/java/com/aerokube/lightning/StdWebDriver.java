@@ -167,18 +167,23 @@ public class StdWebDriver implements WebDriver {
     class Cookies implements WebDriver.Cookies {
 
         @Override
-        public void add(@Nonnull Cookie cookie) {
-
+        public Cookies add(@Nonnull Cookie cookie) {
+            CookieRequest cookieRequest = new CookieRequest()
+                    .cookie(((com.aerokube.lightning.Cookie) cookie).raw());
+            execute(() -> cookiesApi.addCookie(sessionId, cookieRequest));
+            return this;
         }
 
         @Override
-        public void delete(@Nonnull String name) {
+        public Cookies delete(@Nonnull String name) {
             execute(() -> cookiesApi.deleteCookie(sessionId, name));
+            return this;
         }
 
         @Override
-        public void deleteAll() {
+        public Cookies deleteAll() {
             execute(() -> cookiesApi.deleteAllCookies(sessionId));
+            return this;
         }
 
         @Override
@@ -231,13 +236,15 @@ public class StdWebDriver implements WebDriver {
     class Prompts implements WebDriver.Prompts {
 
         @Override
-        public void accept() {
+        public Prompts accept() {
             execute(() -> promptsApi.acceptAlert(sessionId));
+            return this;
         }
 
         @Override
-        public void dismiss() {
+        public Prompts dismiss() {
             execute(() -> promptsApi.dismissAlert(sessionId));
+            return this;
         }
 
         @Override
@@ -247,11 +254,12 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public void sendText(@Nonnull String text) {
+        public Prompts sendText(@Nonnull String text) {
             execute(() -> {
                 SendAlertTextRequest sendAlertTextRequest = new SendAlertTextRequest().text(text);
                 return promptsApi.sendAlertText(sessionId, sendAlertTextRequest);
             });
+            return this;
         }
     }
 
@@ -286,13 +294,15 @@ public class StdWebDriver implements WebDriver {
     class Navigation implements WebDriver.Navigation {
 
         @Override
-        public void back() {
+        public Navigation back() {
             execute(() -> navigationApi.navigateBack(sessionId));
+            return this;
         }
 
         @Override
-        public void forward() {
+        public WebDriver.Navigation forward() {
             execute(() -> navigationApi.navigateForward(sessionId));
+            return this;
         }
 
         @Nonnull
@@ -302,16 +312,18 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public void navigate(@Nonnull String url) {
+        public Navigation navigate(@Nonnull String url) {
             execute(() -> {
                 UrlRequest urlRequest = new UrlRequest().url(url);
                 return navigationApi.navigateTo(sessionId, urlRequest);
             });
+            return this;
         }
 
         @Override
-        public void refresh() {
+        public WebDriver.Navigation refresh() {
             execute(() -> navigationApi.refreshPage(sessionId));
+            return this;
         }
 
         @Nonnull
@@ -340,8 +352,9 @@ public class StdWebDriver implements WebDriver {
             return execute(() -> timeoutsApi.getTimeouts(sessionId).getValue());
         }
 
-        void setTimeouts(com.aerokube.lightning.model.Timeouts timeouts) {
+        Timeouts setTimeouts(com.aerokube.lightning.model.Timeouts timeouts) {
             execute(() -> timeoutsApi.setTimeouts(sessionId, timeouts));
+            return this;
         }
 
         @Nonnull
@@ -366,8 +379,8 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public void setPageLoadTimeout(@Nonnull Duration value) {
-            setTimeouts(new com.aerokube.lightning.model.Timeouts() {
+        public Timeouts setPageLoadTimeout(@Nonnull Duration value) {
+            return setTimeouts(new com.aerokube.lightning.model.Timeouts() {
                 {
                     setPageLoad(value.toMillis());
                 }
@@ -381,8 +394,8 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public void setScriptTimeout(@Nullable Duration value) {
-            setTimeouts(new com.aerokube.lightning.model.Timeouts() {
+        public Timeouts setScriptTimeout(@Nullable Duration value) {
+            return setTimeouts(new com.aerokube.lightning.model.Timeouts() {
                 {
                     setScript(value != null ? value.toMillis() : null);
                 }

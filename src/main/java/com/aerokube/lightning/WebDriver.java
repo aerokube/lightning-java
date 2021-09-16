@@ -100,11 +100,11 @@ public interface WebDriver {
 
     interface Cookies {
 
-        void add(@Nonnull Cookie cookie);
+        Cookies add(@Nonnull Cookie cookie);
 
-        void delete(@Nonnull String name);
+        Cookies delete(@Nonnull String name);
 
-        void deleteAll();
+        Cookies deleteAll();
 
         Cookie get(@Nonnull String name);
 
@@ -170,12 +170,11 @@ public interface WebDriver {
 
     }
 
-    //TODO: replace void with types to allow chaining...
     interface Navigation {
 
-        void back();
+        Navigation back();
 
-        void forward();
+        Navigation forward();
 
         @Nonnull
         String getTitle();
@@ -183,22 +182,22 @@ public interface WebDriver {
         @Nonnull
         String getUrl();
 
-        void navigate(@Nonnull String url);
+        Navigation navigate(@Nonnull String url);
 
-        void refresh();
+        Navigation refresh();
 
     }
 
     interface Prompts {
 
-        void accept();
+        Prompts accept();
 
-        void dismiss();
+        Prompts dismiss();
 
         @Nonnull
         String getText(@Nonnull String text);
 
-        void sendText(String text);
+        Prompts sendText(String text);
 
     }
 
@@ -230,11 +229,11 @@ public interface WebDriver {
         @Nonnull
         Duration getPageLoadTimeout();
 
-        void setPageLoadTimeout(@Nonnull Duration value);
+        Timeouts setPageLoadTimeout(@Nonnull Duration value);
 
         Optional<Duration> getScriptTimeout();
 
-        void setScriptTimeout(@Nullable Duration value);
+        Timeouts setScriptTimeout(@Nullable Duration value);
     }
 
 }
