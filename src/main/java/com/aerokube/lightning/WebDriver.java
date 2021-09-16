@@ -22,6 +22,10 @@ public interface WebDriver {
 
     Cookies cookies();
 
+    Windows windows();
+
+    Frames frames();
+
     // TODO: add javadoc
     Document document();
 
@@ -34,6 +38,65 @@ public interface WebDriver {
     Timeouts timeouts();
 
     String getSessionId();
+
+    interface Windows {
+
+        List<Window> list();
+
+        Window createWindow();
+
+        Window createTab();
+
+        Window current();
+
+        interface Window {
+
+            Window close();
+
+            Window fullscreen();
+
+            Window maximize();
+
+            Window minimize();
+
+            Window setSize(int width, int height);
+
+            Size getSize();
+
+            Position getPosition();
+
+            Window setPosition(int x, int y);
+
+            Window switchTo();
+
+            interface Size {
+
+                int getWidth();
+
+                int getHeight();
+
+            }
+
+            interface Position {
+
+                int getX();
+
+                int getY();
+
+            }
+
+        }
+
+    }
+
+    interface Frames {
+        void switchTo(int index);
+
+        //TODO: add switchTo(WebElement webElement); call
+        void switchToParent();
+
+        void switchToDefault();
+    }
 
     interface Cookies {
 
@@ -107,6 +170,7 @@ public interface WebDriver {
 
     }
 
+    //TODO: replace void with types to allow chaining...
     interface Navigation {
 
         void back();

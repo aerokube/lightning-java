@@ -14,6 +14,9 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.aerokube.lightning.model.NewWindowRequest.TypeEnum.TAB;
+import static com.aerokube.lightning.model.NewWindowRequest.TypeEnum.WINDOW;
+
 public class StdWebDriver implements WebDriver {
 
     private final ApiClient apiClient = new ApiClient();
@@ -37,6 +40,8 @@ public class StdWebDriver implements WebDriver {
     private final WebDriver.Session session;
     private final WebDriver.Screenshot screenshot;
     private final WebDriver.Timeouts timeouts;
+    private final WebDriver.Windows windows;
+    private final WebDriver.Frames frames;
 
     public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri) {
         this(
@@ -66,6 +71,8 @@ public class StdWebDriver implements WebDriver {
         this.session = new Session();
         this.screenshot = new Screenshot();
         this.timeouts = new Timeouts();
+        this.windows = new Windows();
+        this.frames = new Frames();
     }
 
     private void initApiClient(@Nullable String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
@@ -138,6 +145,14 @@ public class StdWebDriver implements WebDriver {
 
     public WebDriver.Session session() {
         return session;
+    }
+
+    public WebDriver.Windows windows() {
+        return windows;
+    }
+
+    public WebDriver.Frames frames() {
+        return frames;
     }
 
     @Override
@@ -372,6 +387,162 @@ public class StdWebDriver implements WebDriver {
                     setScript(value != null ? value.toMillis() : null);
                 }
             });
+        }
+    }
+
+
+    class Windows implements WebDriver.Windows {
+
+        @Override
+        public List<Window> list() {
+            return execute(() -> contextsApi.getWindowHandles(sessionId).getValue()).stream()
+                    .map(StdWindow::new)
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        public Window createWindow() {
+            return createWindow(WINDOW);
+        }
+
+        private Window createWindow(NewWindowRequest.TypeEnum type) {
+            NewWindowRequest newWindowRequest = new NewWindowRequest().type(type);
+            String handle = execute(() -> contextsApi.createNewWindow(sessionId, newWindowRequest).getValue().getHandle());
+            return new StdWindow(handle);
+        }
+
+        @Override
+        public Window createTab() {
+            return createWindow(TAB);
+        }
+
+        @Override
+        public Window current() {
+            String handle = execute(() -> contextsApi.getWindowHandle(sessionId).getValue());
+            return new StdWindow(handle);
+        }
+
+        class StdWindow implements WebDriver.Windows.Window {
+
+            private final String handle;
+
+            StdWindow(String handle) {
+                this.handle = handle;
+            }
+
+            @Override
+            public WebDriver.Windows.Window close() {
+                switchTo();
+                execute(() -> contextsApi.closeWindow(sessionId));
+                return this;
+            }
+
+            @Override
+            public WebDriver.Windows.Window fullscreen() {
+                switchTo();
+                execute(() -> contextsApi.fullscreenWindow(sessionId));
+                return this;
+            }
+
+            @Override
+            public WebDriver.Windows.Window maximize() {
+                switchTo();
+                execute(() -> contextsApi.maximizeWindow(sessionId));
+                return this;
+            }
+
+            @Override
+            public WebDriver.Windows.Window minimize() {
+                switchTo();
+                execute(() -> contextsApi.minimizeWindow(sessionId));
+                return this;
+            }
+
+            @Override
+            public WebDriver.Windows.Window setSize(int width, int height) {
+                switchTo();
+                com.aerokube.lightning.model.Rect rect = new com.aerokube.lightning.model.Rect()
+                        .width(width).height(height);
+                execute(() -> contextsApi.setWindowRect(sessionId, rect));
+                return this;
+            }
+
+            @Override
+            public Size getSize() {
+                return new Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
+            }
+
+            @Override
+            public Position getPosition() {
+                return new Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
+            }
+
+            @Override
+            public WebDriver.Windows.Window setPosition(int x, int y) {
+                switchTo();
+                com.aerokube.lightning.model.Rect rect = new com.aerokube.lightning.model.Rect()
+                        .x(x).y(y);
+                execute(() -> contextsApi.setWindowRect(sessionId, rect));
+                return this;
+            }
+
+            @Override
+            public WebDriver.Windows.Window switchTo() {
+                SwitchToWindowRequest switchToWindowRequest = new SwitchToWindowRequest().handle(handle);
+                execute(() -> contextsApi.switchToWindow(sessionId, switchToWindowRequest));
+                return this;
+            }
+        }
+
+        class Rect implements Window.Position, Window.Size {
+
+            private final com.aerokube.lightning.model.Rect rect;
+
+            Rect(com.aerokube.lightning.model.Rect rect) {
+                this.rect = rect;
+            }
+
+            @Override
+            public int getWidth() {
+                return rect.getWidth();
+            }
+
+            @Override
+            public int getHeight() {
+                return rect.getHeight();
+            }
+
+            @Override
+            public int getX() {
+                return rect.getX();
+            }
+
+            @Override
+            public int getY() {
+                return rect.getY();
+            }
+        }
+    }
+
+    class Frames implements WebDriver.Frames {
+
+        @Override
+        public void switchTo(int index) {
+            SwitchToFrameRequest switchToFrameRequest = new SwitchToFrameRequest()
+                    .id(new FrameId(index));
+            execute(() -> contextsApi.switchToFrame(sessionId, switchToFrameRequest));
+        }
+
+        @Override
+        public void switchToParent() {
+            execute(() -> contextsApi.switchToParentFrame(sessionId));
+        }
+
+        @Override
+        public void switchToDefault() {
+            SwitchToFrameRequest switchToFrameRequest = new SwitchToFrameRequest()
+                    .id(new FrameId((Integer) null));
+            execute(() -> contextsApi.switchToFrame(sessionId, switchToFrameRequest));
         }
     }
 
