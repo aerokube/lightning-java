@@ -21,7 +21,7 @@ public class Test {
         try {
             driver.navigation().navigate("https://aerokube.com/");
 
-            byte[] data = driver.screenshot().takeScreenshot();
+            byte[] data = driver.screenshot().take();
             Files.write(Paths.get("screenshot.png"), data);
 
         } finally {

@@ -50,12 +50,14 @@ public class Cookie implements WebDriver.Cookies.Cookie {
         return cookie.getHttpOnly();
     }
 
+    @Nonnull
     @Override
     public Optional<Instant> getExpires() {
         Long expiry = cookie.getExpiry();
         return expiry != null ? Optional.of(Instant.ofEpochSecond(expiry)) : Optional.empty();
     }
 
+    @Nonnull
     @Override
     public com.aerokube.lightning.model.Cookie.SameSiteEnum getSameSitePolicy() {
         return cookie.getSameSite();
@@ -69,42 +71,49 @@ public class Cookie implements WebDriver.Cookies.Cookie {
             this.cookie = new com.aerokube.lightning.model.Cookie().name(name).value(value);
         }
 
+        @Nonnull
         @Override
         public WebDriver.Cookies.CookieBuilder path(@Nonnull String path) {
             cookie.setPath(path);
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Cookies.CookieBuilder domain(@Nonnull String domain) {
             cookie.setDomain(domain);
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Cookies.CookieBuilder secureOnly(boolean secureOnly) {
             cookie.setSecure(secureOnly);
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Cookies.CookieBuilder httpOnly(boolean httpOnly) {
             cookie.setHttpOnly(httpOnly);
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Cookies.CookieBuilder expires(@Nonnull Instant expires) {
             cookie.setExpiry(expires.getEpochSecond());
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Cookies.CookieBuilder sameSitePolicy(@Nonnull com.aerokube.lightning.model.Cookie.SameSiteEnum sameSitePolicy) {
             cookie.setSameSite(sameSitePolicy);
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Cookies.Cookie build() {
             return new Cookie(cookie);

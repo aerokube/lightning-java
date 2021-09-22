@@ -35,6 +35,7 @@ public class StdWebDriver implements WebDriver {
     private final String sessionId;
 
     private final WebDriver.Document document;
+    private final WebDriver.Elements elements;
     private final WebDriver.Navigation navigation;
     private final WebDriver.Prompts prompts;
     private final WebDriver.Session session;
@@ -66,6 +67,7 @@ public class StdWebDriver implements WebDriver {
         });
 
         this.document = new Document();
+        this.elements = new Elements();
         this.navigation = new Navigation();
         this.prompts = new Prompts();
         this.session = new Session();
@@ -101,6 +103,7 @@ public class StdWebDriver implements WebDriver {
             return new WebDriverException(e);
         }
         try {
+            //TODO: match error code and throw exceptions like StaleElementReference when needed
             ErrorResponse errorResponse = apiClient.getObjectMapper().readValue(body, new TypeReference<>() {
             });
             ErrorResponseValue value = errorResponse.getValue();
@@ -123,49 +126,94 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
+    @Nonnull
     public String getSessionId() {
         return sessionId;
     }
 
+    @Nonnull
     public WebDriver.Document document() {
         return document;
     }
 
+    @Nonnull
+    public WebDriver.Elements elements() {
+        return elements;
+    }
+
+    @Nonnull
     public WebDriver.Navigation navigation() {
         return navigation;
     }
 
+    @Nonnull
     public WebDriver.Prompts prompts() {
         return prompts;
     }
 
+    @Nonnull
     public WebDriver.Screenshot screenshot() {
         return screenshot;
     }
 
+    @Nonnull
     public WebDriver.Session session() {
         return session;
     }
 
+    @Nonnull
     public WebDriver.Windows windows() {
         return windows;
     }
 
+    @Nonnull
     public WebDriver.Frames frames() {
         return frames;
     }
 
+    @Nonnull
     @Override
     public Cookies cookies() {
         return new Cookies();
     }
 
+    @Nonnull
     public WebDriver.Timeouts timeouts() {
         return timeouts;
     }
 
+    static class Rect implements Position, Size {
+
+        private final com.aerokube.lightning.model.Rect rect;
+
+        Rect(com.aerokube.lightning.model.Rect rect) {
+            this.rect = rect;
+        }
+
+        @Override
+        public int getWidth() {
+            return rect.getWidth();
+        }
+
+        @Override
+        public int getHeight() {
+            return rect.getHeight();
+        }
+
+        @Override
+        public int getX() {
+            return rect.getX();
+        }
+
+        @Override
+        public int getY() {
+            return rect.getY();
+        }
+    }
+
     class Cookies implements WebDriver.Cookies {
 
+        @Nonnull
         @Override
         public Cookies add(@Nonnull Cookie cookie) {
             CookieRequest cookieRequest = new CookieRequest()
@@ -174,21 +222,26 @@ public class StdWebDriver implements WebDriver {
             return this;
         }
 
+        @Nonnull
         @Override
         public Cookies delete(@Nonnull String name) {
             execute(() -> cookiesApi.deleteCookie(sessionId, name));
             return this;
         }
 
+        @Nonnull
         @Override
         public Cookies deleteAll() {
             execute(() -> cookiesApi.deleteAllCookies(sessionId));
             return this;
         }
 
+        @Nonnull
         @Override
         public Cookie get(@Nonnull String name) {
-            return null;
+            return new com.aerokube.lightning.Cookie(
+                    execute(() -> cookiesApi.getNamedCookie(sessionId, name).getValue())
+            );
         }
 
         @Nonnull
@@ -235,12 +288,14 @@ public class StdWebDriver implements WebDriver {
 
     class Prompts implements WebDriver.Prompts {
 
+        @Nonnull
         @Override
         public Prompts accept() {
             execute(() -> promptsApi.acceptAlert(sessionId));
             return this;
         }
 
+        @Nonnull
         @Override
         public Prompts dismiss() {
             execute(() -> promptsApi.dismissAlert(sessionId));
@@ -253,6 +308,7 @@ public class StdWebDriver implements WebDriver {
             return execute(() -> promptsApi.getAlertText(sessionId).getValue());
         }
 
+        @Nonnull
         @Override
         public Prompts sendText(@Nonnull String text) {
             execute(() -> {
@@ -270,6 +326,7 @@ public class StdWebDriver implements WebDriver {
             execute(() -> sessionsApi.deleteSession(sessionId));
         }
 
+        @Nonnull
         @Override
         public Status status() {
             return execute(() -> {
@@ -293,12 +350,14 @@ public class StdWebDriver implements WebDriver {
 
     class Navigation implements WebDriver.Navigation {
 
+        @Nonnull
         @Override
         public Navigation back() {
             execute(() -> navigationApi.navigateBack(sessionId));
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Navigation forward() {
             execute(() -> navigationApi.navigateForward(sessionId));
@@ -311,6 +370,7 @@ public class StdWebDriver implements WebDriver {
             return execute(() -> navigationApi.getCurrentUrl(sessionId).getValue());
         }
 
+        @Nonnull
         @Override
         public Navigation navigate(@Nonnull String url) {
             execute(() -> {
@@ -320,6 +380,7 @@ public class StdWebDriver implements WebDriver {
             return this;
         }
 
+        @Nonnull
         @Override
         public WebDriver.Navigation refresh() {
             execute(() -> navigationApi.refreshPage(sessionId));
@@ -337,9 +398,17 @@ public class StdWebDriver implements WebDriver {
     class Screenshot implements WebDriver.Screenshot {
 
         @Override
-        public byte[] takeScreenshot() {
+        public byte[] take() {
             return execute(() -> {
                 String encodedBytes = screenshotsApi.takeScreenshot(sessionId).getValue();
+                return Base64.getDecoder().decode(encodedBytes);
+            });
+        }
+
+        @Override
+        public byte[] take(Element element) {
+            return execute(() -> {
+                String encodedBytes = screenshotsApi.takeElementScreenshot(sessionId, element.getId()).getValue();
                 return Base64.getDecoder().decode(encodedBytes);
             });
         }
@@ -378,6 +447,7 @@ public class StdWebDriver implements WebDriver {
             return Duration.ofMillis(getTimeouts().getPageLoad());
         }
 
+        @Nonnull
         @Override
         public Timeouts setPageLoadTimeout(@Nonnull Duration value) {
             return setTimeouts(new com.aerokube.lightning.model.Timeouts() {
@@ -387,12 +457,14 @@ public class StdWebDriver implements WebDriver {
             });
         }
 
+        @Nonnull
         @Override
         public Optional<Duration> getScriptTimeout() {
             Long value = getTimeouts().getScript();
             return value != null ? Optional.of(Duration.ofMillis(value)) : Optional.empty();
         }
 
+        @Nonnull
         @Override
         public Timeouts setScriptTimeout(@Nullable Duration value) {
             return setTimeouts(new com.aerokube.lightning.model.Timeouts() {
@@ -403,9 +475,9 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-
     class Windows implements WebDriver.Windows {
 
+        @Nonnull
         @Override
         public List<Window> list() {
             return execute(() -> contextsApi.getWindowHandles(sessionId).getValue()).stream()
@@ -413,6 +485,7 @@ public class StdWebDriver implements WebDriver {
                     .collect(Collectors.toList());
         }
 
+        @Nonnull
         @Override
         public Window createWindow() {
             return createWindow(WINDOW);
@@ -424,11 +497,13 @@ public class StdWebDriver implements WebDriver {
             return new StdWindow(handle);
         }
 
+        @Nonnull
         @Override
         public Window createTab() {
             return createWindow(TAB);
         }
 
+        @Nonnull
         @Override
         public Window current() {
             String handle = execute(() -> contextsApi.getWindowHandle(sessionId).getValue());
@@ -443,6 +518,7 @@ public class StdWebDriver implements WebDriver {
                 this.handle = handle;
             }
 
+            @Nonnull
             @Override
             public WebDriver.Windows.Window close() {
                 switchTo();
@@ -450,6 +526,7 @@ public class StdWebDriver implements WebDriver {
                 return this;
             }
 
+            @Nonnull
             @Override
             public WebDriver.Windows.Window fullscreen() {
                 switchTo();
@@ -457,6 +534,7 @@ public class StdWebDriver implements WebDriver {
                 return this;
             }
 
+            @Nonnull
             @Override
             public WebDriver.Windows.Window maximize() {
                 switchTo();
@@ -464,6 +542,7 @@ public class StdWebDriver implements WebDriver {
                 return this;
             }
 
+            @Nonnull
             @Override
             public WebDriver.Windows.Window minimize() {
                 switchTo();
@@ -471,6 +550,7 @@ public class StdWebDriver implements WebDriver {
                 return this;
             }
 
+            @Nonnull
             @Override
             public WebDriver.Windows.Window setSize(int width, int height) {
                 switchTo();
@@ -480,16 +560,19 @@ public class StdWebDriver implements WebDriver {
                 return this;
             }
 
+            @Nonnull
             @Override
             public Size getSize() {
-                return new Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
+                return new StdWebDriver.Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
             }
 
+            @Nonnull
             @Override
             public Position getPosition() {
-                return new Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
+                return new StdWebDriver.Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
             }
 
+            @Nonnull
             @Override
             public WebDriver.Windows.Window setPosition(int x, int y) {
                 switchTo();
@@ -499,6 +582,7 @@ public class StdWebDriver implements WebDriver {
                 return this;
             }
 
+            @Nonnull
             @Override
             public WebDriver.Windows.Window switchTo() {
                 SwitchToWindowRequest switchToWindowRequest = new SwitchToWindowRequest().handle(handle);
@@ -507,34 +591,6 @@ public class StdWebDriver implements WebDriver {
             }
         }
 
-        class Rect implements Window.Position, Window.Size {
-
-            private final com.aerokube.lightning.model.Rect rect;
-
-            Rect(com.aerokube.lightning.model.Rect rect) {
-                this.rect = rect;
-            }
-
-            @Override
-            public int getWidth() {
-                return rect.getWidth();
-            }
-
-            @Override
-            public int getHeight() {
-                return rect.getHeight();
-            }
-
-            @Override
-            public int getX() {
-                return rect.getX();
-            }
-
-            @Override
-            public int getY() {
-                return rect.getY();
-            }
-        }
     }
 
     class Frames implements WebDriver.Frames {
@@ -543,6 +599,13 @@ public class StdWebDriver implements WebDriver {
         public void switchTo(int index) {
             SwitchToFrameRequest switchToFrameRequest = new SwitchToFrameRequest()
                     .id(new FrameId(index));
+            execute(() -> contextsApi.switchToFrame(sessionId, switchToFrameRequest));
+        }
+
+        @Override
+        public void switchTo(@Nonnull Element element) {
+            SwitchToFrameRequest switchToFrameRequest = new SwitchToFrameRequest()
+                    .id(new FrameId(new WebElement().element606611e4A52e4f735466cecf(element.getId())));
             execute(() -> contextsApi.switchToFrame(sessionId, switchToFrameRequest));
         }
 
@@ -559,4 +622,167 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
+    class Elements implements WebDriver.Elements {
+
+        @Nonnull
+        @Override
+        public Element findFirst(@Nonnull Locator locator) {
+            FindElementRequest findElementRequest = new FindElementRequest()
+                    .using(locator.getStrategy()).value(locator.getExpression());
+            String elementId = execute(() -> elementsApi.findElement(sessionId, findElementRequest)
+                    .getValue().getElement606611e4A52e4f735466cecf());
+            return new StdElement(elementId);
+        }
+
+        @Nonnull
+        @Override
+        public List<Element> findAll(@Nonnull Locator locator) {
+            FindElementRequest findElementRequest = new FindElementRequest()
+                    .using(locator.getStrategy()).value(locator.getExpression());
+            return execute(() -> elementsApi.findElements(sessionId, findElementRequest)
+                    .getValue()).stream()
+                    .map(e -> new StdElement(e.getElement606611e4A52e4f735466cecf()))
+                    .collect(Collectors.toList());
+        }
+
+        @Nonnull
+        @Override
+        public Element current() {
+            return new StdElement(execute(() ->
+                    elementsApi.getActiveElement(sessionId).getValue().getElement606611e4A52e4f735466cecf()));
+        }
+
+        class StdElement implements WebDriver.Element {
+
+            private final String id;
+
+            StdElement(String id) {
+                this.id = id;
+            }
+
+            @Nonnull
+            @Override
+            public Element click() {
+                execute(() -> elementsApi.elementClick(sessionId, id));
+                return this;
+            }
+
+            @Nonnull
+            @Override
+            public Element clear() {
+                execute(() -> elementsApi.elementClear(sessionId, id));
+                return this;
+            }
+
+            @Nonnull
+            @Override
+            public List<Element> findAll(@Nonnull Locator locator) {
+                FindElementRequest findElementRequest = new FindElementRequest()
+                        .using(locator.getStrategy()).value(locator.getExpression());
+                return execute(() -> elementsApi.findElementsFromElement(sessionId, id, findElementRequest)
+                        .getValue()).stream()
+                        .map(e -> new StdElement(e.getElement606611e4A52e4f735466cecf()))
+                        .collect(Collectors.toList());
+            }
+
+            @Nonnull
+            @Override
+            public Element findFirst(@Nonnull Locator locator) {
+                FindElementRequest findElementRequest = new FindElementRequest()
+                        .using(locator.getStrategy()).value(locator.getExpression());
+                String elementId = execute(() -> elementsApi.findElementFromElement(sessionId, id, findElementRequest)
+                        .getValue().getElement606611e4A52e4f735466cecf());
+                return new StdElement(elementId);
+            }
+
+            @Override
+            public boolean isSelected() {
+                return execute(() -> elementsApi.isElementSelected(sessionId, id).getValue());
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return execute(() -> elementsApi.isElementEnabled(sessionId, id).getValue());
+            }
+
+            @Nonnull
+            @Override
+            public Optional<String> getAttribute(@Nonnull String name) {
+                return Optional.ofNullable(
+                        execute(() -> elementsApi.getElementAttribute(sessionId, id, name).getValue())
+                );
+            }
+
+            @Nonnull
+            @Override
+            public String getId() {
+                return id;
+            }
+
+            @Nonnull
+            @Override
+            public Position getPosition() {
+                return new Rect(execute(() -> elementsApi.getElementRect(sessionId, id)));
+            }
+
+            @Nonnull
+            @Override
+            public Optional<String> getProperty(@Nonnull String name) {
+                return Optional.ofNullable(
+                        execute(() -> elementsApi.getElementProperty(sessionId, id, name).getValue())
+                );
+            }
+
+            @Nonnull
+            @Override
+            public String getCssProperty(@Nonnull String name) {
+                return execute(() -> elementsApi.getElementCSSProperty(sessionId, id, name).getValue());
+            }
+
+            @Nonnull
+            @Override
+            public Size getSize() {
+                return new Rect(execute(() -> elementsApi.getElementRect(sessionId, id)));
+            }
+
+            @Nonnull
+            @Override
+            public String getTagName(@Nonnull String name) {
+                return execute(() -> elementsApi.getElementTagName(sessionId, id).getValue());
+            }
+
+            @Nonnull
+            @Override
+            public String getText() {
+                return execute(() -> elementsApi.getElementText(sessionId, id).getValue());
+            }
+
+            @Nonnull
+            @Override
+            public Element sendKeys(@Nonnull String text) {
+                ElementSendKeysRequest elementSendKeysRequest = new ElementSendKeysRequest().text(text);
+                execute(() -> elementsApi.elementSendKeys(sessionId, id, elementSendKeysRequest));
+                return this;
+            }
+
+            @Nonnull
+            @Override
+            public Accessibility accessibility() {
+                return new Accessibility() {
+                    @Nonnull
+                    @Override
+                    public String getRole() {
+                        return execute(() -> elementsApi.getElementComputedRole(sessionId, id).getValue());
+                    }
+
+                    @Nonnull
+                    @Override
+                    public String getLabel() {
+                        return execute(() -> elementsApi.getElementComputedLabel(sessionId, id).getValue());
+                    }
+                };
+            }
+        }
+
+    }
 }
