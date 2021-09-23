@@ -34,6 +34,7 @@ public class StdWebDriver implements WebDriver {
 
     private final String sessionId;
 
+    private final WebDriver.Actions actions;
     private final WebDriver.Document document;
     private final WebDriver.Elements elements;
     private final WebDriver.Navigation navigation;
@@ -66,6 +67,7 @@ public class StdWebDriver implements WebDriver {
             return session.getValue().getSessionId();
         });
 
+        this.actions = new Actions();
         this.document = new Document();
         this.elements = new Elements();
         this.navigation = new Navigation();
@@ -127,46 +129,61 @@ public class StdWebDriver implements WebDriver {
     }
 
     @Nonnull
+    @Override
     public String getSessionId() {
         return sessionId;
     }
 
     @Nonnull
+    @Override
     public WebDriver.Document document() {
         return document;
     }
 
     @Nonnull
+    @Override
     public WebDriver.Elements elements() {
         return elements;
     }
 
     @Nonnull
+    @Override
     public WebDriver.Navigation navigation() {
         return navigation;
     }
 
     @Nonnull
+    @Override
     public WebDriver.Prompts prompts() {
         return prompts;
     }
 
     @Nonnull
+    @Override
     public WebDriver.Screenshot screenshot() {
         return screenshot;
     }
 
     @Nonnull
+    @Override
     public WebDriver.Session session() {
         return session;
     }
 
     @Nonnull
+    @Override
+    public WebDriver.Actions actions() {
+        return actions;
+    }
+
+    @Nonnull
+    @Override
     public WebDriver.Windows windows() {
         return windows;
     }
 
     @Nonnull
+    @Override
     public WebDriver.Frames frames() {
         return frames;
     }
@@ -178,6 +195,7 @@ public class StdWebDriver implements WebDriver {
     }
 
     @Nonnull
+    @Override
     public WebDriver.Timeouts timeouts() {
         return timeouts;
     }
@@ -253,6 +271,16 @@ public class StdWebDriver implements WebDriver {
                     .collect(Collectors.toList());
         }
 
+    }
+
+    class Actions implements WebDriver.Actions {
+
+        @Nonnull
+        @Override
+        public WebDriver.Actions release() {
+            execute(() -> actionsApi.releaseActions(sessionId));
+            return this;
+        }
     }
 
     class Document implements WebDriver.Document {

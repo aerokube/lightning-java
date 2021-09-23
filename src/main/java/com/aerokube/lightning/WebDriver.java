@@ -26,6 +26,9 @@ public interface WebDriver {
     Session session();
 
     @Nonnull
+    Actions actions();
+
+    @Nonnull
     Cookies cookies();
 
     @Nonnull
@@ -55,6 +58,15 @@ public interface WebDriver {
 
     @Nonnull
     String getSessionId();
+
+    interface Actions {
+
+        @Nonnull
+        Actions release();
+
+        //TODO: add actions builder and perform() method
+
+    }
 
     interface Elements {
 
