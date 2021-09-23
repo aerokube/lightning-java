@@ -9,8 +9,8 @@ public class Test {
 
     public static void main(String[] args) throws IOException {
 
-        Capabilities capabilities = new Capabilities();
-        capabilities.setBrowserName("chrome");
+        Capabilities capabilities = Capabilities.create()
+                .browserName("chrome");
         WebDriver driver = WebDriver.create(
                 capabilities,
                 "http://localhost:4444/",
