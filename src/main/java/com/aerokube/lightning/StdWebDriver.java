@@ -105,7 +105,6 @@ public class StdWebDriver implements WebDriver {
             return new WebDriverException(e);
         }
         try {
-            //TODO: match error code and throw exceptions like StaleElementReference when needed
             ErrorResponse errorResponse = apiClient.getObjectMapper().readValue(body, new TypeReference<>() {
             });
             ErrorResponseValue value = errorResponse.getValue();
@@ -122,7 +121,7 @@ public class StdWebDriver implements WebDriver {
                         (k, v) -> errorMessage.append(String.format("\n%s=%s", k, v))
                 );
             }
-            return new WebDriverException(errorMessage.toString());
+            return new WebDriverException(errorMessage.toString(), value.getError());
         } catch (IOException caught) {
             return new WebDriverException(caught);
         }
