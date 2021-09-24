@@ -338,7 +338,7 @@ public class StdWebDriver implements WebDriver {
 
         @Override
         public @Nonnull
-        String getText(@Nonnull String text) {
+        String getText() {
             return execute(() -> promptsApi.getAlertText(sessionId).getValue());
         }
 
@@ -440,7 +440,7 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public byte[] take(Element element) {
+        public byte[] take(WebElement element) {
             return execute(() -> {
                 String encodedBytes = screenshotsApi.takeElementScreenshot(sessionId, element.getId()).getValue();
                 return Base64.getDecoder().decode(encodedBytes);
@@ -637,9 +637,9 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public void switchTo(@Nonnull Element element) {
+        public void switchTo(@Nonnull WebElement element) {
             SwitchToFrameRequest switchToFrameRequest = new SwitchToFrameRequest()
-                    .id(new FrameId(new WebElement().element606611e4A52e4f735466cecf(element.getId())));
+                    .id(new FrameId(new com.aerokube.lightning.model.WebElement().element606611e4A52e4f735466cecf(element.getId())));
             execute(() -> contextsApi.switchToFrame(sessionId, switchToFrameRequest));
         }
 
@@ -660,7 +660,7 @@ public class StdWebDriver implements WebDriver {
 
         @Nonnull
         @Override
-        public Element findFirst(@Nonnull Locator locator) {
+        public WebElement findFirst(@Nonnull Locator locator) {
             FindElementRequest findElementRequest = new FindElementRequest()
                     .using(locator.getStrategy()).value(locator.getExpression());
             String elementId = execute(() -> elementsApi.findElement(sessionId, findElementRequest)
@@ -670,7 +670,7 @@ public class StdWebDriver implements WebDriver {
 
         @Nonnull
         @Override
-        public List<Element> findAll(@Nonnull Locator locator) {
+        public List<WebElement> findAll(@Nonnull Locator locator) {
             FindElementRequest findElementRequest = new FindElementRequest()
                     .using(locator.getStrategy()).value(locator.getExpression());
             return execute(() -> elementsApi.findElements(sessionId, findElementRequest)
@@ -681,12 +681,12 @@ public class StdWebDriver implements WebDriver {
 
         @Nonnull
         @Override
-        public Element current() {
+        public WebElement current() {
             return new StdElement(execute(() ->
                     elementsApi.getActiveElement(sessionId).getValue().getElement606611e4A52e4f735466cecf()));
         }
 
-        class StdElement implements WebDriver.Element {
+        class StdElement implements WebElement {
 
             private final String id;
 
@@ -696,21 +696,21 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public Element click() {
+            public WebElement click() {
                 execute(() -> elementsApi.elementClick(sessionId, id));
                 return this;
             }
 
             @Nonnull
             @Override
-            public Element clear() {
+            public WebElement clear() {
                 execute(() -> elementsApi.elementClear(sessionId, id));
                 return this;
             }
 
             @Nonnull
             @Override
-            public List<Element> findAll(@Nonnull Locator locator) {
+            public List<WebElement> findAll(@Nonnull Locator locator) {
                 FindElementRequest findElementRequest = new FindElementRequest()
                         .using(locator.getStrategy()).value(locator.getExpression());
                 return execute(() -> elementsApi.findElementsFromElement(sessionId, id, findElementRequest)
@@ -721,7 +721,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public Element findFirst(@Nonnull Locator locator) {
+            public WebElement findFirst(@Nonnull Locator locator) {
                 FindElementRequest findElementRequest = new FindElementRequest()
                         .using(locator.getStrategy()).value(locator.getExpression());
                 String elementId = execute(() -> elementsApi.findElementFromElement(sessionId, id, findElementRequest)
@@ -793,7 +793,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public Element sendKeys(@Nonnull String text) {
+            public WebElement sendKeys(@Nonnull String text) {
                 ElementSendKeysRequest elementSendKeysRequest = new ElementSendKeysRequest().text(text);
                 execute(() -> elementsApi.elementSendKeys(sessionId, id, elementSendKeysRequest));
                 return this;

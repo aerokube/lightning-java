@@ -74,13 +74,13 @@ public interface WebDriver {
     interface Elements {
 
         @Nonnull
-        Element findFirst(@Nonnull Locator locator);
+        WebElement findFirst(@Nonnull Locator locator);
 
         @Nonnull
-        List<WebDriver.Element> findAll(@Nonnull WebDriver.Locator locator);
+        List<WebElement> findAll(@Nonnull WebDriver.Locator locator);
 
         @Nonnull
-        Element current();
+        WebElement current();
 
     }
 
@@ -134,7 +134,7 @@ public interface WebDriver {
     interface Frames {
         void switchTo(int index);
 
-        void switchTo(@Nonnull Element element);
+        void switchTo(@Nonnull WebElement element);
 
         void switchToParent();
 
@@ -257,7 +257,7 @@ public interface WebDriver {
         Prompts dismiss();
 
         @Nonnull
-        String getText(@Nonnull String text);
+        String getText();
 
         @Nonnull
         Prompts sendText(String text);
@@ -267,7 +267,7 @@ public interface WebDriver {
     interface Screenshot {
         byte[] take();
 
-        byte[] take(Element element);
+        byte[] take(WebElement element);
     }
 
     interface Session {
@@ -317,66 +317,6 @@ public interface WebDriver {
         int getX();
 
         int getY();
-
-    }
-
-    interface Element {
-
-        @Nonnull
-        Element click();
-
-        @Nonnull
-        Element clear();
-
-        @Nonnull
-        List<Element> findAll(@Nonnull Locator locator);
-
-        @Nonnull
-        Element findFirst(@Nonnull Locator locator);
-
-        boolean isSelected();
-
-        boolean isEnabled();
-
-        @Nonnull
-        Optional<String> getAttribute(@Nonnull String name);
-
-        @Nonnull
-        String getId();
-
-        @Nonnull
-        Position getPosition();
-
-        @Nonnull
-        Optional<String> getProperty(@Nonnull String name);
-
-        @Nonnull
-        String getCssProperty(@Nonnull String name);
-
-        @Nonnull
-        Size getSize();
-
-        @Nonnull
-        String getTagName();
-
-        @Nonnull
-        String getText();
-
-        @Nonnull
-        Element sendKeys(@Nonnull String text);
-
-        @Nonnull
-        Accessibility accessibility();
-
-        interface Accessibility {
-
-            @Nonnull
-            String getRole();
-
-            @Nonnull
-            String getLabel();
-
-        }
 
     }
 

@@ -22,22 +22,22 @@ public class By implements WebDriver.Locator {
     }
 
     @Nonnull
-    public static WebDriver.Locator xpath(@Nonnull String xpath) {
+    public static By  xpath(@Nonnull String xpath) {
         return new By(xpath, XPATH);
     }
 
     @Nonnull
-    public static WebDriver.Locator tagName(@Nonnull String tagName) {
+    public static By  tagName(@Nonnull String tagName) {
         return new By(tagName, TAG_NAME);
     }
 
     @Nonnull
-    public static WebDriver.Locator linkText(@Nonnull String linkText) {
+    public static By  linkText(@Nonnull String linkText) {
         return new By(linkText, LINK_TEXT);
     }
 
     @Nonnull
-    public static WebDriver.Locator partialLinkText(@Nonnull String partialLinkText) {
+    public static By partialLinkText(@Nonnull String partialLinkText) {
         return new By(partialLinkText, PARTIAL_LINK_TEXT);
     }
 
