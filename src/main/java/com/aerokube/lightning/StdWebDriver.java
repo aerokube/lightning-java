@@ -31,6 +31,7 @@ public class StdWebDriver implements WebDriver {
     private final ScreenshotsApi screenshotsApi = new ScreenshotsApi(apiClient);
     private final SessionsApi sessionsApi = new SessionsApi(apiClient);
     private final TimeoutsApi timeoutsApi = new TimeoutsApi(apiClient);
+    private final PrintApi printApi = new PrintApi(apiClient);
 
     private final String sessionId;
 
@@ -155,6 +156,12 @@ public class StdWebDriver implements WebDriver {
     @Override
     public WebDriver.Prompts prompts() {
         return prompts;
+    }
+
+    @Nonnull
+    @Override
+    public WebDriver.Print print() {
+        return new Print();
     }
 
     @Nonnull
@@ -774,7 +781,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public String getTagName(@Nonnull String name) {
+            public String getTagName() {
                 return execute(() -> elementsApi.getElementTagName(sessionId, id).getValue());
             }
 
@@ -811,5 +818,95 @@ public class StdWebDriver implements WebDriver {
             }
         }
 
+    }
+
+    class Print implements WebDriver.Print {
+
+        private final PrintRequestOptions printRequestOptions = new PrintRequestOptions()
+                .page(new PrintRequestOptionsPage())
+                .margin(new PrintRequestOptionsMargin());
+
+        @Nonnull
+        @Override
+        public WebDriver.Print addPages(@Nonnull int... pages) {
+            Arrays.stream(pages).forEach(
+                    p -> printRequestOptions.getPageRanges().add(String.valueOf(p))
+            );
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print addPages(@Nonnull String... pages) {
+            Arrays.stream(pages).forEach(
+                    p -> printRequestOptions.getPageRanges().add(p)
+            );
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print scale(float scale) {
+            printRequestOptions.setScale(scale);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print originalSize() {
+            printRequestOptions.setShrinkToFit(false);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print width(float value) {
+            printRequestOptions.getPage().setWidth(value);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print height(float value) {
+            printRequestOptions.getPage().setHeight(value);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print marginTop(float value) {
+            printRequestOptions.getMargin().setTop(value);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print marginBottom(float value) {
+            printRequestOptions.getMargin().setBottom(value);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print marginLeft(float value) {
+            printRequestOptions.getMargin().setLeft(value);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print marginRight(float value) {
+            printRequestOptions.getMargin().setRight(value);
+            return this;
+        }
+
+        @Override
+        public byte[] pdf() {
+            PrintRequest printRequest = new PrintRequest().options(printRequestOptions);
+            return execute(() -> {
+                String encodedBytes = printApi.printPage(sessionId, printRequest).getValue();
+                return Base64.getDecoder().decode(encodedBytes);
+            });
+        }
     }
 }

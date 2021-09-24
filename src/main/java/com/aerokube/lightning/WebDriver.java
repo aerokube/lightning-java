@@ -51,6 +51,9 @@ public interface WebDriver {
     Prompts prompts();
 
     @Nonnull
+    Print print();
+
+    @Nonnull
     Screenshot screenshot();
 
     @Nonnull
@@ -354,7 +357,7 @@ public interface WebDriver {
         Size getSize();
 
         @Nonnull
-        String getTagName(@Nonnull String name);
+        String getTagName();
 
         @Nonnull
         String getText();
@@ -375,6 +378,41 @@ public interface WebDriver {
 
         }
 
+    }
+
+    interface Print {
+
+        @Nonnull
+        Print addPages(@Nonnull int... pages);
+
+        @Nonnull
+        Print addPages(@Nonnull String... pages);
+
+        @Nonnull
+        Print scale(float scale);
+
+        @Nonnull
+        Print originalSize();
+
+        @Nonnull
+        Print width(float value);
+
+        @Nonnull
+        Print height(float value);
+
+        @Nonnull
+        Print marginTop(float value);
+
+        @Nonnull
+        Print marginBottom(float value);
+
+        @Nonnull
+        Print marginLeft(float value);
+
+        @Nonnull
+        Print marginRight(float value);
+
+        byte[] pdf();
     }
 
     interface Locator {

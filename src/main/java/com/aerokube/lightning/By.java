@@ -6,48 +6,48 @@ import javax.annotation.Nonnull;
 
 import static com.aerokube.lightning.model.LocatorStrategy.*;
 
-public final class By {
+public class By implements WebDriver.Locator {
+
+    private final String expression;
+    private final LocatorStrategy strategy;
+
+    public By(String expression, LocatorStrategy strategy) {
+        this.expression = expression;
+        this.strategy = strategy;
+    }
 
     @Nonnull
-    public static WebDriver.Locator cssSelector(@Nonnull String cssSelector) {
-        return locator(cssSelector, CSS_SELECTOR);
+    public static By cssSelector(@Nonnull String cssSelector) {
+        return new By(cssSelector, CSS_SELECTOR);
     }
 
     @Nonnull
     public static WebDriver.Locator xpath(@Nonnull String xpath) {
-        return locator(xpath, XPATH);
+        return new By(xpath, XPATH);
     }
 
     @Nonnull
     public static WebDriver.Locator tagName(@Nonnull String tagName) {
-        return locator(tagName, TAG_NAME);
+        return new By(tagName, TAG_NAME);
     }
 
     @Nonnull
     public static WebDriver.Locator linkText(@Nonnull String linkText) {
-        return locator(linkText, LINK_TEXT);
+        return new By(linkText, LINK_TEXT);
     }
 
     @Nonnull
     public static WebDriver.Locator partialLinkText(@Nonnull String partialLinkText) {
-        return locator(partialLinkText, PARTIAL_LINK_TEXT);
+        return new By(partialLinkText, PARTIAL_LINK_TEXT);
     }
 
     @Nonnull
-    private static WebDriver.Locator locator(String expression, LocatorStrategy locatorStrategy) {
-        return new WebDriver.Locator() {
-            @Nonnull
-            @Override
-            public String getExpression() {
-                return expression;
-            }
-
-            @Nonnull
-            @Override
-            public LocatorStrategy getStrategy() {
-                return locatorStrategy;
-            }
-        };
+    public String getExpression() {
+        return expression;
     }
 
+    @Nonnull
+    public LocatorStrategy getStrategy() {
+        return strategy;
+    }
 }

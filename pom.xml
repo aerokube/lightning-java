@@ -13,7 +13,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <swagger.version>1.6.2</swagger.version>
-        <openapi-spec.version>1.0.5</openapi-spec.version>
+        <openapi-spec.version>1.0.6</openapi-spec.version>
         <openapi-plugin.version>5.1.0</openapi-plugin.version>
         <jackson.version>2.12.5</jackson.version>
     </properties>
