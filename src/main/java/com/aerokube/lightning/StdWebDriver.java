@@ -21,17 +21,17 @@ public class StdWebDriver implements WebDriver {
 
     private final ApiClient apiClient = new ApiClient();
 
-    private final ActionsApi actionsApi = new ActionsApi(apiClient);
-    private final ContextsApi contextsApi = new ContextsApi(apiClient);
-    private final CookiesApi cookiesApi = new CookiesApi(apiClient);
-    private final DocumentApi documentApi = new DocumentApi(apiClient);
-    private final ElementsApi elementsApi = new ElementsApi(apiClient);
-    private final NavigationApi navigationApi = new NavigationApi(apiClient);
-    private final PromptsApi promptsApi = new PromptsApi(apiClient);
-    private final ScreenshotsApi screenshotsApi = new ScreenshotsApi(apiClient);
-    private final SessionsApi sessionsApi = new SessionsApi(apiClient);
-    private final TimeoutsApi timeoutsApi = new TimeoutsApi(apiClient);
-    private final PrintApi printApi = new PrintApi(apiClient);
+    private final ActionsApi actionsApi;
+    private final ContextsApi contextsApi;
+    private final CookiesApi cookiesApi;
+    private final DocumentApi documentApi;
+    private final ElementsApi elementsApi;
+    private final NavigationApi navigationApi;
+    private final PromptsApi promptsApi;
+    private final ScreenshotsApi screenshotsApi;
+    private final SessionsApi sessionsApi;
+    private final TimeoutsApi timeoutsApi;
+    private final PrintApi printApi;
 
     private final String sessionId;
 
@@ -46,18 +46,29 @@ public class StdWebDriver implements WebDriver {
     private final WebDriver.Windows windows;
     private final WebDriver.Frames frames;
 
-    public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri) {
+    public StdWebDriver(@Nullable String baseUri, @Nonnull Capabilities capabilities) {
         this(
-                capabilities,
-                baseUri,
+                baseUri, capabilities,
                 apiClient -> apiClient.setHttpClientBuilder(
                         HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
                 )
         );
     }
 
-    public StdWebDriver(@Nonnull Capabilities capabilities, @Nullable String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
+    public StdWebDriver(@Nullable String baseUri, @Nonnull Capabilities capabilities, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
         initApiClient(baseUri, apiClientConfigurator);
+
+        actionsApi = new ActionsApi(apiClient);
+        contextsApi = new ContextsApi(apiClient);
+        cookiesApi = new CookiesApi(apiClient);
+        documentApi = new DocumentApi(apiClient);
+        elementsApi = new ElementsApi(apiClient);
+        navigationApi = new NavigationApi(apiClient);
+        promptsApi = new PromptsApi(apiClient);
+        screenshotsApi = new ScreenshotsApi(apiClient);
+        sessionsApi = new SessionsApi(apiClient);
+        timeoutsApi = new TimeoutsApi(apiClient);
+        printApi = new PrintApi(apiClient);
 
         this.sessionId = execute(() -> {
             NewSessionRequestCapabilities newSessionRequestCapabilities = new NewSessionRequestCapabilities()

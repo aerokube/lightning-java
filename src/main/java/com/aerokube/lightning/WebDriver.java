@@ -13,13 +13,13 @@ import java.util.function.Consumer;
 public interface WebDriver {
 
     @Nonnull
-    static WebDriver create(@Nonnull Capabilities capabilities, @Nonnull String baseUri) {
-        return new StdWebDriver(capabilities, baseUri);
+    static WebDriver create(@Nonnull String baseUri, @Nonnull Capabilities capabilities) {
+        return new StdWebDriver(baseUri, capabilities);
     }
 
     @Nonnull
-    static WebDriver create(@Nonnull Capabilities capabilities, @Nonnull String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
-        return new StdWebDriver(capabilities, baseUri, apiClientConfigurator);
+    static WebDriver create(@Nonnull String baseUri, @Nonnull Capabilities capabilities, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
+        return new StdWebDriver(baseUri, capabilities, apiClientConfigurator);
     }
 
     @Nonnull
