@@ -739,6 +739,11 @@ public class StdWebDriver implements WebDriver {
                 return execute(() -> elementsApi.isElementEnabled(sessionId, id).getValue());
             }
 
+            @Override
+            public boolean isDisplayed() {
+                return execute(() -> elementsApi.isElementDisplayed(sessionId, id).getValue());
+            }
+
             @Nonnull
             @Override
             public Optional<String> getAttribute(@Nonnull String name) {

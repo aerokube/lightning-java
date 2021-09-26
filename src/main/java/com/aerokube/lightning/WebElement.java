@@ -22,6 +22,8 @@ public interface WebElement {
 
     boolean isEnabled();
 
+    boolean isDisplayed();
+
     @Nonnull
     Optional<String> getAttribute(@Nonnull String name);
 
