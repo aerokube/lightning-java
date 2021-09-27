@@ -260,7 +260,7 @@ public interface WebDriver {
         @Nonnull
         Duration getImplicitWaitTimeout();
 
-        void setImplicitWaitTimeout(@Nonnull Duration value);
+        Timeouts setImplicitWaitTimeout(@Nonnull Duration value);
 
         @Nonnull
         Duration getPageLoadTimeout();

@@ -474,22 +474,31 @@ public class StdWebDriver implements WebDriver {
         @Nonnull
         @Override
         public Duration getImplicitWaitTimeout() {
-            return Duration.ofMillis(getTimeouts().getImplicit());
+            Long implicit = getTimeouts().getImplicit();
+            if (implicit == null) {
+                implicit = 0L;
+            }
+            return Duration.ofMillis(implicit);
         }
 
         @Override
-        public void setImplicitWaitTimeout(@Nonnull Duration value) {
+        public Timeouts setImplicitWaitTimeout(@Nonnull Duration value) {
             setTimeouts(new com.aerokube.lightning.model.Timeouts() {
                 {
                     setImplicit(value.toMillis());
                 }
             });
+            return this;
         }
 
         @Nonnull
         @Override
         public Duration getPageLoadTimeout() {
-            return Duration.ofMillis(getTimeouts().getPageLoad());
+            Long pageLoad = getTimeouts().getPageLoad();
+            if (pageLoad == null) {
+                pageLoad = 0L;
+            }
+            return Duration.ofMillis(pageLoad);
         }
 
         @Nonnull
