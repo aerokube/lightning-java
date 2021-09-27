@@ -252,7 +252,7 @@ public class StdWebDriver implements WebDriver {
         @Override
         public Cookies add(@Nonnull Cookie cookie) {
             CookieRequest cookieRequest = new CookieRequest()
-                    .cookie(((com.aerokube.lightning.Cookie) cookie).raw());
+                    .cookie(((StdCookie) cookie).raw());
             execute(() -> cookiesApi.addCookie(sessionId, cookieRequest));
             return this;
         }
@@ -274,7 +274,7 @@ public class StdWebDriver implements WebDriver {
         @Nonnull
         @Override
         public Cookie get(@Nonnull String name) {
-            return new com.aerokube.lightning.Cookie(
+            return new StdCookie(
                     execute(() -> cookiesApi.getNamedCookie(sessionId, name).getValue())
             );
         }
@@ -284,7 +284,7 @@ public class StdWebDriver implements WebDriver {
         public List<Cookie> getAll() {
             return execute(() -> cookiesApi.getAllCookies(sessionId).getValue())
                     .stream()
-                    .map(com.aerokube.lightning.Cookie::new)
+                    .map(StdCookie::new)
                     .collect(Collectors.toList());
         }
 
@@ -336,14 +336,14 @@ public class StdWebDriver implements WebDriver {
         @Nonnull
         @Override
         public Prompts accept() {
-            execute(() -> promptsApi.acceptAlert(sessionId));
+            execute(() -> promptsApi.acceptAlert(sessionId, new EmptyRequest()));
             return this;
         }
 
         @Nonnull
         @Override
         public Prompts dismiss() {
-            execute(() -> promptsApi.dismissAlert(sessionId));
+            execute(() -> promptsApi.dismissAlert(sessionId, new EmptyRequest()));
             return this;
         }
 
@@ -398,14 +398,14 @@ public class StdWebDriver implements WebDriver {
         @Nonnull
         @Override
         public Navigation back() {
-            execute(() -> navigationApi.navigateBack(sessionId));
+            execute(() -> navigationApi.navigateBack(sessionId, new EmptyRequest()));
             return this;
         }
 
         @Nonnull
         @Override
         public WebDriver.Navigation forward() {
-            execute(() -> navigationApi.navigateForward(sessionId));
+            execute(() -> navigationApi.navigateForward(sessionId, new EmptyRequest()));
             return this;
         }
 
@@ -428,7 +428,7 @@ public class StdWebDriver implements WebDriver {
         @Nonnull
         @Override
         public WebDriver.Navigation refresh() {
-            execute(() -> navigationApi.refreshPage(sessionId));
+            execute(() -> navigationApi.refreshPage(sessionId, new EmptyRequest()));
             return this;
         }
 
@@ -451,7 +451,7 @@ public class StdWebDriver implements WebDriver {
         }
 
         @Override
-        public byte[] take(WebElement element) {
+        public byte[] take(@Nonnull WebElement element) {
             return execute(() -> {
                 String encodedBytes = screenshotsApi.takeElementScreenshot(sessionId, element.getId()).getValue();
                 return Base64.getDecoder().decode(encodedBytes);
@@ -575,7 +575,7 @@ public class StdWebDriver implements WebDriver {
             @Override
             public WebDriver.Windows.Window fullscreen() {
                 switchTo();
-                execute(() -> contextsApi.fullscreenWindow(sessionId));
+                execute(() -> contextsApi.fullscreenWindow(sessionId, new EmptyRequest()));
                 return this;
             }
 
@@ -583,7 +583,7 @@ public class StdWebDriver implements WebDriver {
             @Override
             public WebDriver.Windows.Window maximize() {
                 switchTo();
-                execute(() -> contextsApi.maximizeWindow(sessionId));
+                execute(() -> contextsApi.maximizeWindow(sessionId, new EmptyRequest()));
                 return this;
             }
 
@@ -591,7 +591,7 @@ public class StdWebDriver implements WebDriver {
             @Override
             public WebDriver.Windows.Window minimize() {
                 switchTo();
-                execute(() -> contextsApi.minimizeWindow(sessionId));
+                execute(() -> contextsApi.minimizeWindow(sessionId, new EmptyRequest()));
                 return this;
             }
 
@@ -708,14 +708,14 @@ public class StdWebDriver implements WebDriver {
             @Nonnull
             @Override
             public WebElement click() {
-                execute(() -> elementsApi.elementClick(sessionId, id));
+                execute(() -> elementsApi.elementClick(sessionId, id, new EmptyRequest()));
                 return this;
             }
 
             @Nonnull
             @Override
             public WebElement clear() {
-                execute(() -> elementsApi.elementClear(sessionId, id));
+                execute(() -> elementsApi.elementClear(sessionId, id, new EmptyRequest()));
                 return this;
             }
 

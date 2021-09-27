@@ -9,15 +9,17 @@ import static org.hamcrest.Matchers.*;
 class SessionTest extends BaseTest {
 
     @Test
-    public void testSessionId() {
-        assertThat(driver.getSessionId().length(), greaterThan(0));
+    void testSessionId() {
+        test(driver -> assertThat(driver.getSessionId().length(), greaterThan(0)));
     }
 
     @Test
-    public void testStatus() {
-        Status status = driver.session().status();
-        assertThat(status.isReady(), equalTo(true));
-        assertThat(status.getMessage(), is(not(emptyString())));
+    void testStatus() {
+        test(driver -> {
+            Status status = driver.session().status();
+            assertThat(status.isReady(), equalTo(true));
+            assertThat(status.getMessage(), is(not(emptyString())));
+        });
     }
 
 }

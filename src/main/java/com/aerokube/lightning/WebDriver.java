@@ -158,35 +158,6 @@ public interface WebDriver {
         @Nonnull
         List<Cookie> getAll();
 
-        interface Cookie {
-
-            static CookieBuilder create(@Nonnull String name, @Nonnull String value) {
-                return new com.aerokube.lightning.Cookie.CookieBuilder(name, value);
-            }
-
-            @Nonnull
-            String getName();
-
-            @Nonnull
-            String getValue();
-
-            @Nonnull
-            String getPath();
-
-            @Nonnull
-            String getDomain();
-
-            boolean isSecureOnly();
-
-            boolean isHttpOnly();
-
-            @Nonnull
-            Optional<Instant> getExpires();
-
-            @Nonnull
-            com.aerokube.lightning.model.Cookie.SameSiteEnum getSameSitePolicy();
-        }
-
         interface CookieBuilder {
 
             @Nonnull
@@ -196,10 +167,10 @@ public interface WebDriver {
             CookieBuilder domain(@Nonnull String domain);
 
             @Nonnull
-            CookieBuilder secureOnly(boolean secureOnly);
+            CookieBuilder secureOnly();
 
             @Nonnull
-            CookieBuilder httpOnly(boolean httpOnly);
+            CookieBuilder httpOnly();
 
             @Nonnull
             CookieBuilder expires(@Nonnull Instant expires);
@@ -260,14 +231,14 @@ public interface WebDriver {
         String getText();
 
         @Nonnull
-        Prompts sendText(String text);
+        Prompts sendText(@Nonnull String text);
 
     }
 
     interface Screenshot {
         byte[] take();
 
-        byte[] take(WebElement element);
+        byte[] take(@Nonnull WebElement element);
     }
 
     interface Session {
@@ -364,4 +335,5 @@ public interface WebDriver {
         LocatorStrategy getStrategy();
 
     }
+
 }

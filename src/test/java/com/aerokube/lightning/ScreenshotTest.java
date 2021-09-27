@@ -8,20 +8,24 @@ import static org.hamcrest.Matchers.greaterThan;
 public class ScreenshotTest extends BaseTest {
 
     @Test
-    public void testPageScreenshot() {
-        driver.navigation()
-                .navigate("https://aerokube.com");
-        byte[] screenshot = driver.screenshot().take();
-        assertThat(screenshot.length, greaterThan(0));
+    void testPageScreenshot() {
+        test(driver -> {
+            driver.navigation()
+                    .navigate("https://example.com");
+            byte[] screenshot = driver.screenshot().take();
+            assertThat(screenshot.length, greaterThan(0));
+        });
     }
 
     @Test
-    public void testElementScreenshot() {
-        driver.navigation()
-                .navigate("https://aerokube.com");
-        WebElement body = driver.elements().findFirst(By.tagName("body"));
-        byte[] screenshot = driver.screenshot().take(body);
-        assertThat(screenshot.length, greaterThan(0));
+    void testElementScreenshot() {
+        test(driver -> {
+            driver.navigation()
+                    .navigate("https://example.com");
+            WebElement body = driver.elements().findFirst(By.tagName("body"));
+            byte[] screenshot = driver.screenshot().take(body);
+            assertThat(screenshot.length, greaterThan(0));
+        });
     }
 
 }
