@@ -189,11 +189,13 @@ public interface WebDriver {
         @Nonnull
         String getPageSource();
 
-        @Nonnull
-        String executeScript(@Nonnull String script, String... args);
+        //TODO: add support for passing WebElement to executeScript()
 
         @Nonnull
-        String executeScriptAsync(@Nonnull String script, @Nonnull String... args);
+        Object executeScript(@Nonnull String script, Object... args);
+
+        @Nonnull
+        Object executeAsyncScript(@Nonnull String script, @Nonnull Object... args);
 
     }
 

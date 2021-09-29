@@ -310,7 +310,7 @@ public class StdWebDriver implements WebDriver {
 
         @Nonnull
         @Override
-        public String executeScript(@Nonnull String script, String... args) {
+        public Object executeScript(@Nonnull String script, Object... args) {
             return execute(() -> {
                 ScriptRequest scriptRequest = new ScriptRequest()
                         .script(script)
@@ -321,7 +321,7 @@ public class StdWebDriver implements WebDriver {
 
         @Nonnull
         @Override
-        public String executeScriptAsync(@Nonnull String script, @Nonnull String... args) {
+        public Object executeAsyncScript(@Nonnull String script, @Nonnull Object... args) {
             return execute(() -> {
                 ScriptRequest scriptRequest = new ScriptRequest()
                         .script(script)
@@ -617,13 +617,13 @@ public class StdWebDriver implements WebDriver {
             @Nonnull
             @Override
             public Size getSize() {
-                return new StdWebDriver.Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
+                return new StdWebDriver.Rect(execute(() -> contextsApi.getWindowRect(sessionId).getValue()));
             }
 
             @Nonnull
             @Override
             public Position getPosition() {
-                return new StdWebDriver.Rect(execute(() -> contextsApi.getWindowRect(sessionId)));
+                return new StdWebDriver.Rect(execute(() -> contextsApi.getWindowRect(sessionId).getValue()));
             }
 
             @Nonnull
@@ -665,13 +665,13 @@ public class StdWebDriver implements WebDriver {
 
         @Override
         public void switchToParent() {
-            execute(() -> contextsApi.switchToParentFrame(sessionId));
+            execute(() -> contextsApi.switchToParentFrame(sessionId, new EmptyRequest()));
         }
 
         @Override
         public void switchToDefault() {
             SwitchToFrameRequest switchToFrameRequest = new SwitchToFrameRequest()
-                    .id(new FrameId((Integer) null));
+                    .id(new FrameId());
             execute(() -> contextsApi.switchToFrame(sessionId, switchToFrameRequest));
         }
     }
