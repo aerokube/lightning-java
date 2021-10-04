@@ -325,6 +325,9 @@ public interface WebDriver {
         @Nonnull
         Print marginRight(float value);
 
+        @Nonnull
+        Print landscape();
+
         byte[] pdf();
     }
 

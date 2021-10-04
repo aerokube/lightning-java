@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static com.aerokube.lightning.model.NewWindowRequest.TypeEnum.TAB;
 import static com.aerokube.lightning.model.NewWindowRequest.TypeEnum.WINDOW;
+import static com.aerokube.lightning.model.PrintRequestOptions.OrientationEnum.LANDSCAPE;
 
 public class StdWebDriver implements WebDriver {
 
@@ -922,6 +923,13 @@ public class StdWebDriver implements WebDriver {
         @Override
         public WebDriver.Print marginRight(float value) {
             printRequestOptions.getMargin().setRight(value);
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public WebDriver.Print landscape() {
+            printRequestOptions.setOrientation(LANDSCAPE);
             return this;
         }
 

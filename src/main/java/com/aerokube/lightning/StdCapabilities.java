@@ -1,7 +1,8 @@
 package com.aerokube.lightning;
 
+import com.aerokube.lightning.ExtensionCapabilities.*;
+
 import javax.annotation.Nonnull;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -146,10 +147,51 @@ public class StdCapabilities implements Capabilities, Capabilities.Proxy {
 
     @Override
     @Nonnull
-    public Capabilities capability(@Nonnull String key, @Nonnull Serializable value) {
+    public Capabilities capability(@Nonnull String key, @Nonnull Object value) {
         capabilities.put(key, value);
         return this;
     }
 
+    @Nonnull
+    @Override
+    public Chrome chrome() {
+        return new ChromeCapabilities(this);
+    }
+
+    @Nonnull
+    @Override
+    public Firefox firefox() {
+        return new FirefoxCapabilities(this);
+    }
+
+    @Nonnull
+    @Override
+    public Edge edge() {
+        return new EdgeCapabilities(this);
+    }
+
+    @Nonnull
+    @Override
+    public Opera opera() {
+        return new OperaCapabilities(this);
+    }
+
+    @Nonnull
+    @Override
+    public Selenoid selenoid() {
+        return new SelenoidCapabilities(this);
+    }
+
+    @Nonnull
+    @Override
+    public Moon moon() {
+        return new MoonCapabilities(this);
+    }
+
+    @Nonnull
+    @Override
+    public Safari safari() {
+        return new SafariCapabilities(this);
+    }
 
 }
