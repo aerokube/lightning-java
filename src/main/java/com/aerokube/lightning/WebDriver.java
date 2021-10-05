@@ -62,7 +62,7 @@ public interface WebDriver {
     @Nonnull
     String getSessionId();
 
-    interface Actions {
+    interface Actions extends WebDriver {
 
         @Nonnull
         Actions release();
@@ -71,7 +71,7 @@ public interface WebDriver {
 
     }
 
-    interface Elements {
+    interface Elements extends WebDriver {
 
         @Nonnull
         WebElement findFirst(@Nonnull Locator locator);
@@ -84,7 +84,7 @@ public interface WebDriver {
 
     }
 
-    interface Windows {
+    interface Windows extends WebDriver {
 
         @Nonnull
         List<Window> list();
@@ -131,7 +131,7 @@ public interface WebDriver {
 
     }
 
-    interface Frames {
+    interface Frames extends WebDriver {
         void switchTo(int index);
 
         void switchTo(@Nonnull WebElement element);
@@ -141,7 +141,7 @@ public interface WebDriver {
         void switchToDefault();
     }
 
-    interface Cookies {
+    interface Cookies extends WebDriver {
 
         @Nonnull
         Cookies add(@Nonnull Cookie cookie);
@@ -184,7 +184,7 @@ public interface WebDriver {
 
     }
 
-    interface Document {
+    interface Document extends WebDriver {
 
         @Nonnull
         String getPageSource();
