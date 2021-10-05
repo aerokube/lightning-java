@@ -199,7 +199,7 @@ public interface WebDriver {
 
     }
 
-    interface Navigation {
+    interface Navigation extends WebDriver {
 
         @Nonnull
         Navigation back();
@@ -221,7 +221,7 @@ public interface WebDriver {
 
     }
 
-    interface Prompts {
+    interface Prompts extends WebDriver {
 
         @Nonnull
         Prompts accept();
@@ -237,13 +237,13 @@ public interface WebDriver {
 
     }
 
-    interface Screenshot {
+    interface Screenshot extends WebDriver {
         byte[] take();
 
         byte[] take(@Nonnull WebElement element);
     }
 
-    interface Session {
+    interface Session extends WebDriver {
 
         void delete();
 
@@ -258,7 +258,7 @@ public interface WebDriver {
         }
     }
 
-    interface Timeouts {
+    interface Timeouts extends WebDriver {
         @Nonnull
         Duration getImplicitWaitTimeout();
 
@@ -293,7 +293,7 @@ public interface WebDriver {
 
     }
 
-    interface Print {
+    interface Print extends WebDriver {
 
         @Nonnull
         Print addPages(@Nonnull int... pages);

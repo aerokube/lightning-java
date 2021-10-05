@@ -37,6 +37,7 @@ public class StdWebDriver implements WebDriver {
     private final String sessionId;
 
     private final WebDriver.Actions actions;
+    private final WebDriver.Cookies cookies;
     private final WebDriver.Document document;
     private final WebDriver.Elements elements;
     private final WebDriver.Navigation navigation;
@@ -80,16 +81,17 @@ public class StdWebDriver implements WebDriver {
             return session.getValue().getSessionId();
         });
 
-        this.actions = new Actions();
-        this.document = new Document();
-        this.elements = new Elements();
-        this.navigation = new Navigation();
-        this.prompts = new Prompts();
-        this.session = new Session();
-        this.screenshot = new Screenshot();
-        this.timeouts = new Timeouts();
-        this.windows = new Windows();
-        this.frames = new Frames();
+        this.actions = new Actions(this);
+        this.cookies = new Cookies(this);
+        this.document = new Document(this);
+        this.elements = new Elements(this);
+        this.navigation = new Navigation(this);
+        this.prompts = new Prompts(this);
+        this.session = new Session(this);
+        this.screenshot = new Screenshot(this);
+        this.timeouts = new Timeouts(this);
+        this.windows = new Windows(this);
+        this.frames = new Frames(this);
     }
 
     private void initApiClient(@Nullable String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
@@ -173,7 +175,7 @@ public class StdWebDriver implements WebDriver {
     @Nonnull
     @Override
     public WebDriver.Print print() {
-        return new Print();
+        return new Print(this);
     }
 
     @Nonnull
@@ -208,8 +210,8 @@ public class StdWebDriver implements WebDriver {
 
     @Nonnull
     @Override
-    public Cookies cookies() {
-        return new Cookies();
+    public WebDriver.Cookies cookies() {
+        return cookies;
     }
 
     @Nonnull
@@ -247,7 +249,98 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Cookies implements WebDriver.Cookies {
+    static class WebDriverDelegate implements WebDriver {
+
+        private final WebDriver webDriver;
+
+        WebDriverDelegate(WebDriver webDriver) {
+            this.webDriver = webDriver;
+        }
+
+        @Override
+        @Nonnull
+        public Session session() {
+            return webDriver.session();
+        }
+
+        @Override
+        @Nonnull
+        public Actions actions() {
+            return webDriver.actions();
+        }
+
+        @Override
+        @Nonnull
+        public Cookies cookies() {
+            return webDriver.cookies();
+        }
+
+        @Override
+        @Nonnull
+        public Elements elements() {
+            return webDriver.elements();
+        }
+
+        @Override
+        @Nonnull
+        public Windows windows() {
+            return webDriver.windows();
+        }
+
+        @Override
+        @Nonnull
+        public Frames frames() {
+            return webDriver.frames();
+        }
+
+        @Override
+        @Nonnull
+        public Document document() {
+            return webDriver.document();
+        }
+
+        @Override
+        @Nonnull
+        public Navigation navigation() {
+            return webDriver.navigation();
+        }
+
+        @Override
+        @Nonnull
+        public Prompts prompts() {
+            return webDriver.prompts();
+        }
+
+        @Override
+        @Nonnull
+        public Print print() {
+            return webDriver.print();
+        }
+
+        @Override
+        @Nonnull
+        public Screenshot screenshot() {
+            return webDriver.screenshot();
+        }
+
+        @Override
+        @Nonnull
+        public Timeouts timeouts() {
+            return webDriver.timeouts();
+        }
+
+        @Override
+        @Nonnull
+        public String getSessionId() {
+            return webDriver.getSessionId();
+        }
+    }
+
+    class Cookies extends WebDriverDelegate implements WebDriver.Cookies {
+
+        Cookies(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override
@@ -291,7 +384,11 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Actions implements WebDriver.Actions {
+    class Actions extends WebDriverDelegate implements WebDriver.Actions {
+
+        Actions(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override
@@ -301,7 +398,11 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Document implements WebDriver.Document {
+    class Document extends WebDriverDelegate implements WebDriver.Document {
+
+        Document(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override
@@ -332,7 +433,11 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Prompts implements WebDriver.Prompts {
+    class Prompts extends WebDriverDelegate implements WebDriver.Prompts {
+
+        Prompts(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override
@@ -365,7 +470,11 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Session implements WebDriver.Session {
+    class Session extends WebDriverDelegate implements WebDriver.Session {
+
+        Session(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Override
         public void delete() {
@@ -394,7 +503,11 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Navigation implements WebDriver.Navigation {
+    class Navigation extends WebDriverDelegate implements WebDriver.Navigation {
+
+        Navigation(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override
@@ -441,7 +554,11 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Screenshot implements WebDriver.Screenshot {
+    class Screenshot extends WebDriverDelegate implements WebDriver.Screenshot {
+
+        Screenshot(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Override
         public byte[] take() {
@@ -461,7 +578,11 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Timeouts implements WebDriver.Timeouts {
+    class Timeouts extends WebDriverDelegate implements WebDriver.Timeouts {
+
+        Timeouts(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         com.aerokube.lightning.model.Timeouts getTimeouts() {
             return execute(() -> timeoutsApi.getTimeouts(sessionId).getValue());
@@ -530,7 +651,11 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Windows implements WebDriver.Windows {
+    class Windows extends WebDriverDelegate implements WebDriver.Windows {
+
+        Windows(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override
@@ -648,7 +773,11 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Frames implements WebDriver.Frames {
+    class Frames extends WebDriverDelegate implements WebDriver.Frames {
+
+        Frames(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Override
         public void switchTo(int index) {
@@ -677,7 +806,11 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Elements implements WebDriver.Elements {
+    class Elements extends WebDriverDelegate implements WebDriver.Elements {
+
+        Elements(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override
@@ -846,11 +979,15 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Print implements WebDriver.Print {
+    class Print extends WebDriverDelegate implements WebDriver.Print {
 
         private final PrintRequestOptions printRequestOptions = new PrintRequestOptions()
                 .page(new PrintRequestOptionsPage())
                 .margin(new PrintRequestOptionsMargin());
+
+        Print(WebDriver webDriver) {
+            super(webDriver);
+        }
 
         @Nonnull
         @Override

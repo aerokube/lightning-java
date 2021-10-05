@@ -3,15 +3,10 @@ package com.aerokube.lightning;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Optional;
 
-import static com.aerokube.lightning.model.Cookie.SameSiteEnum.NONE;
-import static java.time.Duration.ofMinutes;
-import static java.time.Instant.now;
-import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 public class TimeoutsTest extends BaseTest {
 
