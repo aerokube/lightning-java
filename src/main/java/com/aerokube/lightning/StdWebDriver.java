@@ -230,22 +230,22 @@ public class StdWebDriver implements WebDriver {
 
         @Override
         public int getWidth() {
-            return rect.getWidth();
+            return rect.getWidth().intValue();
         }
 
         @Override
         public int getHeight() {
-            return rect.getHeight();
+            return rect.getHeight().intValue();
         }
 
         @Override
         public int getX() {
-            return rect.getX();
+            return rect.getX().intValue();
         }
 
         @Override
         public int getY() {
-            return rect.getY();
+            return rect.getY().intValue();
         }
     }
 
@@ -735,7 +735,7 @@ public class StdWebDriver implements WebDriver {
             public WebDriver.Windows.Window setSize(int width, int height) {
                 switchTo();
                 com.aerokube.lightning.model.Rect rect = new com.aerokube.lightning.model.Rect()
-                        .width(width).height(height);
+                        .width((float) width).height((float) height);
                 execute(() -> contextsApi.setWindowRect(sessionId, rect));
                 return this;
             }
@@ -757,7 +757,7 @@ public class StdWebDriver implements WebDriver {
             public WebDriver.Windows.Window setPosition(int x, int y) {
                 switchTo();
                 com.aerokube.lightning.model.Rect rect = new com.aerokube.lightning.model.Rect()
-                        .x(x).y(y);
+                        .x((float) x).y((float) y);
                 execute(() -> contextsApi.setWindowRect(sessionId, rect));
                 return this;
             }
@@ -915,7 +915,7 @@ public class StdWebDriver implements WebDriver {
             @Nonnull
             @Override
             public Position getPosition() {
-                return new Rect(execute(() -> elementsApi.getElementRect(sessionId, id)));
+                return new Rect(execute(() -> elementsApi.getElementRect(sessionId, id).getValue()));
             }
 
             @Nonnull
@@ -935,7 +935,7 @@ public class StdWebDriver implements WebDriver {
             @Nonnull
             @Override
             public Size getSize() {
-                return new Rect(execute(() -> elementsApi.getElementRect(sessionId, id)));
+                return new Rect(execute(() -> elementsApi.getElementRect(sessionId, id).getValue()));
             }
 
             @Nonnull

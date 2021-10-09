@@ -25,6 +25,7 @@ public class PrintTest extends BaseTest {
                             .marginBottom(1.5f)
                             .marginLeft(1.5f)
                             .marginRight(1.5f)
+                            .landscape()
                             .pdf();
                     assertThat(pdf.length, greaterThan(0));
                 }

@@ -63,7 +63,7 @@ public class StdCookie implements Cookie {
         return cookie.getSameSite();
     }
 
-    public static class CookieBuilder implements WebDriver.Cookies.CookieBuilder {
+    public static class CookieBuilder implements Cookie.CookieBuilder {
 
         private final com.aerokube.lightning.model.Cookie cookie;
 
@@ -73,42 +73,42 @@ public class StdCookie implements Cookie {
 
         @Nonnull
         @Override
-        public WebDriver.Cookies.CookieBuilder path(@Nonnull String path) {
+        public Cookie.CookieBuilder path(@Nonnull String path) {
             cookie.setPath(path);
             return this;
         }
 
         @Nonnull
         @Override
-        public WebDriver.Cookies.CookieBuilder domain(@Nonnull String domain) {
+        public Cookie.CookieBuilder domain(@Nonnull String domain) {
             cookie.setDomain(domain);
             return this;
         }
 
         @Nonnull
         @Override
-        public WebDriver.Cookies.CookieBuilder secureOnly() {
+        public Cookie.CookieBuilder secureOnly() {
             cookie.setSecure(true);
             return this;
         }
 
         @Nonnull
         @Override
-        public WebDriver.Cookies.CookieBuilder httpOnly() {
+        public Cookie.CookieBuilder httpOnly() {
             cookie.setHttpOnly(true);
             return this;
         }
 
         @Nonnull
         @Override
-        public WebDriver.Cookies.CookieBuilder expires(@Nonnull Instant expires) {
+        public Cookie.CookieBuilder expires(@Nonnull Instant expires) {
             cookie.setExpiry(expires.getEpochSecond());
             return this;
         }
 
         @Nonnull
         @Override
-        public WebDriver.Cookies.CookieBuilder sameSitePolicy(@Nonnull com.aerokube.lightning.model.Cookie.SameSiteEnum sameSitePolicy) {
+        public Cookie.CookieBuilder sameSitePolicy(@Nonnull com.aerokube.lightning.model.Cookie.SameSiteEnum sameSitePolicy) {
             cookie.setSameSite(sameSitePolicy);
             return this;
         }

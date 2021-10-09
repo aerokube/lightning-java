@@ -6,7 +6,8 @@ import java.util.Optional;
 
 public interface Cookie {
 
-    static WebDriver.Cookies.CookieBuilder create(@Nonnull String name, @Nonnull String value) {
+    @Nonnull
+    static CookieBuilder create(@Nonnull String name, @Nonnull String value) {
         return new StdCookie.CookieBuilder(name, value);
     }
 
@@ -31,4 +32,28 @@ public interface Cookie {
 
     @Nonnull
     com.aerokube.lightning.model.Cookie.SameSiteEnum getSameSitePolicy();
+
+    interface CookieBuilder {
+
+        @Nonnull
+        CookieBuilder path(@Nonnull String path);
+
+        @Nonnull
+        CookieBuilder domain(@Nonnull String domain);
+
+        @Nonnull
+        CookieBuilder secureOnly();
+
+        @Nonnull
+        CookieBuilder httpOnly();
+
+        @Nonnull
+        CookieBuilder expires(@Nonnull Instant expires);
+
+        @Nonnull
+        CookieBuilder sameSitePolicy(@Nonnull com.aerokube.lightning.model.Cookie.SameSiteEnum sameSitePolicy);
+
+        @Nonnull
+        Cookie build();
+    }
 }

@@ -31,7 +31,7 @@ public interface WebElement {
     String getId();
 
     @Nonnull
-    WebDriver.Position getPosition();
+    Position getPosition();
 
     @Nonnull
     Optional<String> getProperty(@Nonnull String name);
@@ -40,7 +40,7 @@ public interface WebElement {
     String getCssProperty(@Nonnull String name);
 
     @Nonnull
-    WebDriver.Size getSize();
+    Size getSize();
 
     @Nonnull
     String getTagName();

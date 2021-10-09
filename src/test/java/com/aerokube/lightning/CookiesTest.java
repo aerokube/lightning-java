@@ -46,6 +46,8 @@ public class CookiesTest extends BaseTest {
             assertThat(fetchedCookie.getValue(), equalTo(COOKIE_VALUE));
             assertThat(fetchedCookie.getDomain(), endsWith(COOKIE_DOMAIN));
             assertThat(fetchedCookie.getPath(), equalTo("/"));
+            assertThat(fetchedCookie.isSecureOnly(), is(true));
+            assertThat(fetchedCookie.isHttpOnly(), is(true));
             Optional<Instant> expires = fetchedCookie.getExpires();
             assertThat(expires.isPresent(), is(true));
             assertThat(expires.get(), equalTo(COOKIE_EXPIRES.truncatedTo(SECONDS)));

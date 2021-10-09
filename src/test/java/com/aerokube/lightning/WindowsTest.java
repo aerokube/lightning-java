@@ -1,7 +1,5 @@
 package com.aerokube.lightning;
 
-import com.aerokube.lightning.WebDriver.Position;
-import com.aerokube.lightning.WebDriver.Size;
 import com.aerokube.lightning.WebDriver.Windows.Window;
 import org.junit.jupiter.api.Test;
 

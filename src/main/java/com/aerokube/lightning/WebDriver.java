@@ -5,7 +5,6 @@ import com.aerokube.lightning.model.LocatorStrategy;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -158,30 +157,6 @@ public interface WebDriver {
         @Nonnull
         List<Cookie> getAll();
 
-        interface CookieBuilder {
-
-            @Nonnull
-            CookieBuilder path(@Nonnull String path);
-
-            @Nonnull
-            CookieBuilder domain(@Nonnull String domain);
-
-            @Nonnull
-            CookieBuilder secureOnly();
-
-            @Nonnull
-            CookieBuilder httpOnly();
-
-            @Nonnull
-            CookieBuilder expires(@Nonnull Instant expires);
-
-            @Nonnull
-            CookieBuilder sameSitePolicy(@Nonnull com.aerokube.lightning.model.Cookie.SameSiteEnum sameSitePolicy);
-
-            @Nonnull
-            Cookie build();
-        }
-
     }
 
     interface Document extends WebDriver {
@@ -275,22 +250,6 @@ public interface WebDriver {
 
         @Nonnull
         Timeouts setScriptTimeout(@Nullable Duration value);
-    }
-
-    interface Size {
-
-        int getWidth();
-
-        int getHeight();
-
-    }
-
-    interface Position {
-
-        int getX();
-
-        int getY();
-
     }
 
     interface Print extends WebDriver {
