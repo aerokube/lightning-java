@@ -2,6 +2,11 @@ package com.aerokube.lightning;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -37,6 +42,30 @@ public class DocumentTest extends BaseTest {
                     40, 2
             );
             assertThat(asyncResult, equalTo(42));
+        });
+    }
+
+    @Test
+    void testUploadFile() throws Exception {
+        // Upload file to container via API, copy file from container and compare contents
+        Path exampleFile = Files.createTempFile("lightning", "");
+        Path copiedFileDir = Files.createTempDirectory("lightning");
+        final String testString = "test-string";
+        Files.writeString(exampleFile, testString);
+        test(driver -> {
+            String remotePath = driver
+                    .navigation().navigate("https://example.com/")
+                    .document().uploadFile(exampleFile);
+            assertThat(remotePath, is(not(emptyString())));
+            String uploadedFileName = Paths.get(remotePath).getFileName().toString();
+            Path copiedFilePath = copiedFileDir.resolve(uploadedFileName);
+            browserContainer.copyFileFromContainer(remotePath, copiedFilePath.toAbsolutePath().toString());
+            try {
+                String copiedFileContents = new String(Files.readAllBytes(copiedFilePath));
+                assertThat(copiedFileContents, is(equalTo(testString)));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 

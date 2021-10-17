@@ -1,6 +1,5 @@
 package com.aerokube.lightning;
 
-import com.aerokube.lightning.WebDriver.Windows.Window;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

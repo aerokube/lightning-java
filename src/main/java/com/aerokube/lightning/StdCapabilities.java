@@ -154,6 +154,12 @@ public class StdCapabilities implements Capabilities, Capabilities.Proxy {
 
     @Nonnull
     @Override
+    public Object capability(@Nonnull String key) {
+        return capabilities.get(key);
+    }
+
+    @Nonnull
+    @Override
     public Chrome chrome() {
         return new ChromeCapabilities(this);
     }

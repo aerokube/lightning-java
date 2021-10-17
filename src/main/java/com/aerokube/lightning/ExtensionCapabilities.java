@@ -4,20 +4,17 @@ import com.aerokube.lightning.Capabilities.Chrome.MobileEmulation.DeviceMetrics;
 import com.aerokube.lightning.model.*;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
+import static com.aerokube.lightning.FileUtils.*;
 import static com.aerokube.lightning.model.Capabilities.*;
+import static com.aerokube.lightning.model.LogLevel.ALL;
+import static com.aerokube.lightning.model.LogType.PERFORMANCE;
 import static com.aerokube.lightning.model.MoonMobileDevice.OrientationEnum.LANDSCAPE;
 
 public class ExtensionCapabilities implements Capabilities {
@@ -26,48 +23,6 @@ public class ExtensionCapabilities implements Capabilities {
 
     ExtensionCapabilities(Capabilities capabilities) {
         this.capabilities = capabilities;
-    }
-
-    private static List<String> serializeFiles(Path... files) {
-        List<String> serializedFiles = new ArrayList<>();
-        for (Path file : files) {
-            if (!Files.exists(file)) {
-                throw new WebDriverException(String.format("Extension does not exist: %s", file.toAbsolutePath()));
-            }
-            serializedFiles.add(encodeFileToBase64(file));
-        }
-        return serializedFiles;
-    }
-
-    private static Path zipDirectory(Path dir) {
-        try {
-            Path zipPath = Files.createTempFile("lightning", "");
-            try (ZipOutputStream zs = new ZipOutputStream(Files.newOutputStream(zipPath))) {
-                Files.walk(dir)
-                        .filter(path -> !Files.isDirectory(path))
-                        .forEach(path -> {
-                            try {
-                                ZipEntry zipEntry = new ZipEntry(dir.relativize(path).toString());
-                                zs.putNextEntry(zipEntry);
-                                Files.copy(path, zs);
-                                zs.closeEntry();
-                            } catch (IOException e) {
-                                throw new WebDriverException(e);
-                            }
-                        });
-            }
-            return zipPath;
-        } catch (IOException e) {
-            throw new WebDriverException(e);
-        }
-    }
-
-    private static String encodeFileToBase64(Path path) {
-        try {
-            return Base64.getEncoder().encodeToString(Files.readAllBytes(path));
-        } catch (IOException e) {
-            throw new WebDriverException(e);
-        }
     }
 
     private static <T> void update(Supplier<T> source, Consumer<T> action) {
@@ -147,6 +102,12 @@ public class ExtensionCapabilities implements Capabilities {
         return capabilities.capability(key, value);
     }
 
+    @Nonnull
+    @Override
+    public Object capability(@Nonnull String key) {
+        return capabilities.capability(key);
+    }
+
     @Override
     @Nonnull
     public Chrome chrome() {
@@ -195,15 +156,17 @@ public class ExtensionCapabilities implements Capabilities {
         return capabilities.raw();
     }
 
-    static class ChromeCapabilities extends ExtensionCapabilities implements Capabilities.Chrome, Chrome.PerformanceLogging, Chrome.MobileEmulation, DeviceMetrics {
+    static class ChromeCapabilities extends ExtensionCapabilities implements Capabilities.Chrome, Chrome.Logging, Chrome.PerformanceLogging, Chrome.MobileEmulation, DeviceMetrics {
 
         private final ChromeOptions chromeOptions;
+        private final LoggingPrefs loggingPrefs;
         private final PerfLoggingPrefs perfLoggingPrefs;
         private final com.aerokube.lightning.model.MobileEmulation mobileEmulation;
 
         ChromeCapabilities(Capabilities capabilities) {
             super(capabilities);
             this.chromeOptions = new ChromeOptions();
+            this.loggingPrefs = new LoggingPrefs();
             this.perfLoggingPrefs = new PerfLoggingPrefs();
             this.mobileEmulation = new com.aerokube.lightning.model.MobileEmulation();
             capabilities
@@ -242,14 +205,18 @@ public class ExtensionCapabilities implements Capabilities {
         @Nonnull
         @Override
         public Chrome excludeSwitches(@Nonnull String... switches) {
-            chromeOptions.setExcludeSwitches(Arrays.asList(switches));
+            if (switches.length > 0) {
+                chromeOptions.setExcludeSwitches(Arrays.asList(switches));
+            }
             return this;
         }
 
         @Nonnull
         @Override
         public Chrome extensions(@Nonnull Path... extensions) {
-            chromeOptions.setExtensions(ExtensionCapabilities.serializeFiles(extensions));
+            if (extensions.length > 0) {
+                chromeOptions.setExtensions(serializeFiles(extensions));
+            }
             return this;
         }
 
@@ -269,7 +236,14 @@ public class ExtensionCapabilities implements Capabilities {
 
         @Nonnull
         @Override
+        public Logging logging() {
+            return this;
+        }
+
+        @Nonnull
+        @Override
         public PerformanceLogging performanceLogging() {
+            log(PERFORMANCE, ALL);
             chromeOptions.setPerfLoggingPrefs(perfLoggingPrefs);
             return this;
         }
@@ -277,7 +251,9 @@ public class ExtensionCapabilities implements Capabilities {
         @Nonnull
         @Override
         public Chrome windowTypes(@Nonnull String... types) {
-            chromeOptions.setWindowTypes(Arrays.asList(types));
+            if (types.length > 0) {
+                chromeOptions.setWindowTypes(Arrays.asList(types));
+            }
             return this;
         }
 
@@ -347,7 +323,9 @@ public class ExtensionCapabilities implements Capabilities {
         @Nonnull
         @Override
         public PerformanceLogging traceCategories(@Nonnull String... categories) {
-            update(() -> perfLoggingPrefs, pl -> pl.setTraceCategories(String.join(",", categories)));
+            if (categories.length > 0) {
+                update(() -> perfLoggingPrefs, pl -> pl.setTraceCategories(String.join(",", categories)));
+            }
             return this;
         }
 
@@ -358,6 +336,32 @@ public class ExtensionCapabilities implements Capabilities {
             return this;
         }
 
+        @Nonnull
+        @Override
+        public Logging log(@Nonnull LogType type, @Nonnull LogLevel level) {
+            switch (type) {
+                case BROWSER:
+                    loggingPrefs.browser(level);
+                    break;
+                case CLIENT:
+                    loggingPrefs.client(level);
+                    break;
+                case DRIVER:
+                    loggingPrefs.driver(level);
+                    break;
+                case PERFORMANCE:
+                    loggingPrefs.performance(level);
+                    break;
+                case PROFILER:
+                    loggingPrefs.profiler(level);
+                    break;
+                case SERVER:
+                    loggingPrefs.server(level);
+                    break;
+            }
+            capabilities.capability(JSON_PROPERTY_GOOG_COLON_LOGGING_PREFS, loggingPrefs);
+            return this;
+        }
     }
 
     static class EdgeCapabilities extends ExtensionCapabilities implements Capabilities.Edge {
@@ -375,7 +379,9 @@ public class ExtensionCapabilities implements Capabilities {
         @Nonnull
         @Override
         public Edge args(@Nonnull String... args) {
-            edgeOptions.setArgs(Arrays.asList(args));
+            if (args.length > 0) {
+                edgeOptions.setArgs(Arrays.asList(args));
+            }
             return this;
         }
 
@@ -389,7 +395,9 @@ public class ExtensionCapabilities implements Capabilities {
         @Nonnull
         @Override
         public Edge extensions(@Nonnull Path... extensions) {
-            edgeOptions.setExtensions(ExtensionCapabilities.serializeFiles(extensions));
+            if (extensions.length > 0) {
+                edgeOptions.setExtensions(serializeFiles(extensions));
+            }
             return this;
         }
     }
@@ -401,13 +409,17 @@ public class ExtensionCapabilities implements Capabilities {
         OperaCapabilities(Capabilities capabilities) {
             super(capabilities);
             this.operaOptions = new OperaOptions();
-            capabilities.capability(JSON_PROPERTY_OPERA_OPTIONS, operaOptions);
+            capabilities
+                    .browserName("opera")
+                    .capability(JSON_PROPERTY_OPERA_OPTIONS, operaOptions);
         }
 
         @Nonnull
         @Override
         public Opera args(@Nonnull String... args) {
-            operaOptions.setArgs(Arrays.asList(args));
+            if (args.length > 0) {
+                operaOptions.setArgs(Arrays.asList(args));
+            }
             return this;
         }
 
@@ -421,7 +433,9 @@ public class ExtensionCapabilities implements Capabilities {
         @Nonnull
         @Override
         public Opera extensions(@Nonnull Path... extensions) {
-            operaOptions.setExtensions(ExtensionCapabilities.serializeFiles(extensions));
+            if (extensions.length > 0) {
+                operaOptions.setExtensions(serializeFiles(extensions));
+            }
             return this;
         }
     }
@@ -462,7 +476,25 @@ public class ExtensionCapabilities implements Capabilities {
         @Nonnull
         @Override
         public Firefox androidIntentArguments(@Nonnull String... arguments) {
-            firefoxOptions.setAndroidIntentArguments(Arrays.asList(arguments));
+            if (arguments.length > 0) {
+                firefoxOptions.setAndroidIntentArguments(Arrays.asList(arguments));
+            }
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public Firefox args(@Nonnull String... args) {
+            if (args.length > 0) {
+                firefoxOptions.setArgs(Arrays.asList(args));
+            }
+            return this;
+        }
+
+        @Nonnull
+        @Override
+        public Firefox binary(@Nonnull String binary) {
+            firefoxOptions.setBinary(binary);
             return this;
         }
 
@@ -507,7 +539,7 @@ public class ExtensionCapabilities implements Capabilities {
             if (!Files.exists(directory)) {
                 throw new WebDriverException(String.format("Profile directory does not exist: %s", directory.toAbsolutePath()));
             }
-            String serializedProfile = ExtensionCapabilities.encodeFileToBase64(ExtensionCapabilities.zipDirectory(directory));
+            String serializedProfile = encodeFileToBase64(zipDirectory(directory));
             firefoxOptions.profile(serializedProfile);
             return this;
         }

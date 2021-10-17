@@ -8,12 +8,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.aerokube.lightning.FileUtils.encodeFileToBase64;
+import static com.aerokube.lightning.FileUtils.zipFile;
 import static com.aerokube.lightning.model.NewWindowRequest.TypeEnum.TAB;
 import static com.aerokube.lightning.model.NewWindowRequest.TypeEnum.WINDOW;
 import static com.aerokube.lightning.model.PrintRequestOptions.OrientationEnum.LANDSCAPE;
@@ -35,6 +39,7 @@ public class StdWebDriver implements WebDriver {
     private final PrintApi printApi;
 
     private final String sessionId;
+    private final Capabilities capabilities;
 
     private final WebDriver.Actions actions;
     private final WebDriver.Cookies cookies;
@@ -72,14 +77,25 @@ public class StdWebDriver implements WebDriver {
         timeoutsApi = new TimeoutsApi(apiClient);
         printApi = new PrintApi(apiClient);
 
-        this.sessionId = execute(() -> {
+        NewSessionResponseValue newSessionResponse = execute(() -> {
             NewSessionRequestCapabilities newSessionRequestCapabilities = new NewSessionRequestCapabilities()
                     .alwaysMatch(capabilities.raw());
             NewSessionRequest newSessionRequest = new NewSessionRequest()
                     .capabilities(newSessionRequestCapabilities);
             NewSessionResponse session = sessionsApi.createSession(newSessionRequest);
-            return session.getValue().getSessionId();
+            return session.getValue();
         });
+        String returnedSessionId = newSessionResponse.getSessionId();
+        if (returnedSessionId == null || returnedSessionId.isEmpty()) {
+            throw new WebDriverException("Returned session ID is empty");
+        }
+        this.sessionId = returnedSessionId;
+        Capabilities caps = Capabilities.create();
+        com.aerokube.lightning.model.Capabilities returnedCaps = newSessionResponse.getCapabilities();
+        if (returnedCaps != null) {
+            returnedCaps.forEach(caps::capability);
+        }
+        this.capabilities = caps;
 
         this.actions = new Actions(this);
         this.cookies = new Cookies(this);
@@ -146,6 +162,12 @@ public class StdWebDriver implements WebDriver {
     @Override
     public String getSessionId() {
         return sessionId;
+    }
+
+    @Nonnull
+    @Override
+    public Capabilities getCapabilities() {
+        return capabilities;
     }
 
     @Nonnull
@@ -334,6 +356,12 @@ public class StdWebDriver implements WebDriver {
         public String getSessionId() {
             return webDriver.getSessionId();
         }
+
+        @Nonnull
+        @Override
+        public Capabilities getCapabilities() {
+            return webDriver.getCapabilities();
+        }
     }
 
     class Cookies extends WebDriverDelegate implements WebDriver.Cookies {
@@ -431,6 +459,25 @@ public class StdWebDriver implements WebDriver {
                 return documentApi.executeScriptAsync(sessionId, scriptRequest).getValue();
             });
         }
+
+        @Nonnull
+        @Override
+        public String uploadFile(@Nonnull Path file) {
+            if (!Files.exists(file)) {
+                throw new WebDriverException(String.format("Requested files does not exist: %s", file.toAbsolutePath()));
+            }
+            if (Files.isDirectory(file)) {
+                throw new WebDriverException("Uploading directories is not supported");
+            }
+
+            return execute(() -> {
+                String encodedFile = encodeFileToBase64(zipFile(file));
+                FileUploadRequest fileUploadRequest = new FileUploadRequest()
+                        .file(encodedFile);
+                return documentApi.uploadFile(sessionId, fileUploadRequest).getValue();
+            });
+        }
+
     }
 
     class Prompts extends WebDriverDelegate implements WebDriver.Prompts {
@@ -690,7 +737,7 @@ public class StdWebDriver implements WebDriver {
             return new StdWindow(handle);
         }
 
-        class StdWindow implements WebDriver.Windows.Window {
+        class StdWindow implements Window {
 
             private final String handle;
 
@@ -700,7 +747,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public WebDriver.Windows.Window close() {
+            public Window close() {
                 switchTo();
                 execute(() -> contextsApi.closeWindow(sessionId));
                 return this;
@@ -708,7 +755,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public WebDriver.Windows.Window fullscreen() {
+            public Window fullscreen() {
                 switchTo();
                 execute(() -> contextsApi.fullscreenWindow(sessionId, new EmptyRequest()));
                 return this;
@@ -716,7 +763,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public WebDriver.Windows.Window maximize() {
+            public Window maximize() {
                 switchTo();
                 execute(() -> contextsApi.maximizeWindow(sessionId, new EmptyRequest()));
                 return this;
@@ -724,7 +771,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public WebDriver.Windows.Window minimize() {
+            public Window minimize() {
                 switchTo();
                 execute(() -> contextsApi.minimizeWindow(sessionId, new EmptyRequest()));
                 return this;
@@ -732,7 +779,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public WebDriver.Windows.Window setSize(int width, int height) {
+            public Window setSize(int width, int height) {
                 switchTo();
                 com.aerokube.lightning.model.Rect rect = new com.aerokube.lightning.model.Rect()
                         .width((float) width).height((float) height);
@@ -754,7 +801,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public WebDriver.Windows.Window setPosition(int x, int y) {
+            public Window setPosition(int x, int y) {
                 switchTo();
                 com.aerokube.lightning.model.Rect rect = new com.aerokube.lightning.model.Rect()
                         .x((float) x).y((float) y);
@@ -764,7 +811,7 @@ public class StdWebDriver implements WebDriver {
 
             @Nonnull
             @Override
-            public WebDriver.Windows.Window switchTo() {
+            public Window switchTo() {
                 SwitchToWindowRequest switchToWindowRequest = new SwitchToWindowRequest().handle(handle);
                 execute(() -> contextsApi.switchToWindow(sessionId, switchToWindowRequest));
                 return this;

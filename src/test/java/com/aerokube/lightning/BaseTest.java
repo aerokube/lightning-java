@@ -9,18 +9,25 @@ import org.testcontainers.utility.DockerImageName;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static com.aerokube.lightning.Image.CHROME;
+
 @Testcontainers
 class BaseTest {
 
     @Container
-    private final GenericContainer<?> browserContainer = new GenericContainer<>(DockerImageName.parse(getImage()))
+    protected final GenericContainer<?> browserContainer = new GenericContainer<>(DockerImageName.parse(getImage().getRef()))
             .withPrivilegedMode(true)
             .withExposedPorts(4444)
             .waitingFor(new HttpWaitStrategy().forPort(4444).forPath("/status"));
+
     protected WebDriver driver;
 
-    protected String getImage() {
-        return "browsers/chrome:93.0";
+    protected Image getImage() {
+        return CHROME;
+    }
+
+    protected String getUri(int port) {
+        return String.format("http://localhost:%s/", port);
     }
 
     // Yes, we know about @SetUp and @TearDown, but it's easier to pass different capabilities like this
@@ -28,7 +35,7 @@ class BaseTest {
         WebDriver driver = null;
         try {
             Integer port = browserContainer.getMappedPort(4444);
-            driver = WebDriver.create(String.format("http://localhost:%s/", port), caps.get());
+            driver = WebDriver.create(getUri(port), caps.get());
             steps.accept(driver);
         } finally {
             if (driver != null) {

@@ -4,6 +4,7 @@ import com.aerokube.lightning.model.LocatorStrategy;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,9 @@ public interface WebDriver {
     @Nonnull
     String getSessionId();
 
+    @Nonnull
+    Capabilities getCapabilities();
+
     interface Actions extends WebDriver {
 
         @Nonnull
@@ -96,37 +100,6 @@ public interface WebDriver {
 
         @Nonnull
         Window current();
-
-        interface Window {
-
-            @Nonnull
-            Window close();
-
-            @Nonnull
-            Window fullscreen();
-
-            @Nonnull
-            Window maximize();
-
-            @Nonnull
-            Window minimize();
-
-            @Nonnull
-            Window setSize(int width, int height);
-
-            @Nonnull
-            Size getSize();
-
-            @Nonnull
-            Position getPosition();
-
-            @Nonnull
-            Window setPosition(int x, int y);
-
-            @Nonnull
-            Window switchTo();
-
-        }
 
     }
 
@@ -172,6 +145,8 @@ public interface WebDriver {
         @Nonnull
         Object executeAsyncScript(@Nonnull String script, @Nonnull Object... args);
 
+        @Nonnull
+        String uploadFile(@Nonnull Path file);
     }
 
     interface Navigation extends WebDriver {

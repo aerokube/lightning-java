@@ -1,6 +1,8 @@
 package com.aerokube.lightning;
 
 import com.aerokube.lightning.model.FirefoxOptionsLog.LevelEnum;
+import com.aerokube.lightning.model.LogLevel;
+import com.aerokube.lightning.model.LogType;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
@@ -46,6 +48,9 @@ public interface Capabilities {
 
     @Nonnull
     Capabilities capability(@Nonnull String key, @Nonnull Object value);
+
+    @Nonnull
+    Object capability(@Nonnull String key);
 
     @Nonnull
     Chrome chrome();
@@ -120,6 +125,9 @@ public interface Capabilities {
         MobileEmulation mobileEmulation();
 
         @Nonnull
+        Logging logging();
+
+        @Nonnull
         PerformanceLogging performanceLogging();
 
         @Nonnull
@@ -151,6 +159,13 @@ public interface Capabilities {
                 DeviceMetrics touch();
 
             }
+
+        }
+
+        interface Logging extends Capabilities {
+
+            @Nonnull
+            Logging log(@Nonnull LogType type, @Nonnull LogLevel level);
 
         }
 
@@ -198,6 +213,12 @@ public interface Capabilities {
 
         @Nonnull
         Firefox androidIntentArguments(@Nonnull String... arguments);
+
+        @Nonnull
+        Firefox args(@Nonnull String... args);
+
+        @Nonnull
+        Firefox binary(@Nonnull String binary);
 
         @Nonnull
         Firefox log(@Nonnull LevelEnum level);
