@@ -15,7 +15,7 @@ Lightweight and lightning fast Java [WebDriver](https://www.w3.org/TR/webdriver/
     </dependency>
     ```
 
-3. An example project can be found [here](https://github.com/aerokube/lightning-java-example).
+3. An example project can be found [here](https://github.com/aerokube/lightning-java-examples).
 
 ## Support
 
