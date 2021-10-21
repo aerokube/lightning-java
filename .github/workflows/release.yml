@@ -1,24 +1,15 @@
 name: release
 
 on:
-  workflow_dispatch:
-    inputs:
-      releaseVersion:
-        description: "Default version to use when preparing a release."
-        required: true
-        default: "X.Y.Z"
-      developmentVersion:
-        description: "Default version to use for new local working copy."
-        required: true
-        default: "X.Y.Z-SNAPSHOT"
+  release:
+    types: [published]
+
 jobs:
   lightning-java:
     runs-on: ubuntu-latest
     if: github.repository == 'aerokube/lightning-java'
     steps:
       - uses: actions/checkout@v2
-        with:
-          ssh-key: ${{ secrets.SSH_KEY }}
 
       - name: Setup Java
         uses: actions/setup-java@v2
@@ -31,15 +22,20 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSWORD
 
-
-      - name: Configure Git User
-        run: |
-          git config user.email $GITHUB_REPOSITORY
-          git config user.name "GitHub Actions"
+      - name: Prepare release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
 
       - name: Deploy release
-        run: mvn release:prepare release:perform -B -Dtag=${{ github.event.inputs.releaseVersion }} -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} -P release
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSWORD: ${{ secrets.MAVEN_GPG_PASSWORD }}
+        run: |
+          git config user.name $GITHUB_REPOSITORY
+          git config user.email "aerokube@aerokube.github.com"
+          mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$RELEASE_VERSION
+          git commit -am "Updated version to $RELEASE_VERSION"
+          mvn clean deploy -P release
+          mvn versions:set -DgenerateBackupPoms=false -DnextSnapshot=true
+          git commit -am "Updated version to next snapshot"
+          git push origin master

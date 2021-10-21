@@ -28,7 +28,6 @@
         <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
         <gpg-plugin.version>3.0.1</gpg-plugin.version>
         <nexus-plugin.version>1.6.8</nexus-plugin.version>
-        <release-plugin.version>3.0.0-M4</release-plugin.version>
     </properties>
 
     <dependencies>
@@ -190,11 +189,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-release-plugin</artifactId>
-                        <version>${release-plugin.version}</version>
                     </plugin>
                 </plugins>
             </build>
