@@ -3,6 +3,7 @@ package com.aerokube.lightning;
 import com.aerokube.lightning.ExtensionCapabilities.*;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.List;
 
@@ -182,16 +183,14 @@ public class StdCapabilities implements Capabilities, Capabilities.Proxy {
         return new OperaCapabilities(this);
     }
 
-    @Nonnull
     @Override
-    public Selenoid selenoid() {
-        return new SelenoidCapabilities(this);
-    }
-
-    @Nonnull
-    @Override
-    public Moon moon() {
-        return new MoonCapabilities(this);
+    public <T extends Capabilities> T extension(Class<T> cls) {
+        try {
+            Constructor<T> constructor = cls.getConstructor(Capabilities.class);
+            return constructor.newInstance(this);
+        } catch (Exception e) {
+            throw new WebDriverException(String.format("Failed to initialize extension %s", cls.getCanonicalName()), e);
+        }
     }
 
     @Nonnull

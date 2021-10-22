@@ -15,13 +15,12 @@ import static com.aerokube.lightning.FileUtils.*;
 import static com.aerokube.lightning.model.Capabilities.*;
 import static com.aerokube.lightning.model.LogLevel.ALL;
 import static com.aerokube.lightning.model.LogType.PERFORMANCE;
-import static com.aerokube.lightning.model.MoonMobileDevice.OrientationEnum.LANDSCAPE;
 
 public class ExtensionCapabilities implements Capabilities {
 
     protected final Capabilities capabilities;
 
-    ExtensionCapabilities(Capabilities capabilities) {
+    public ExtensionCapabilities(Capabilities capabilities) {
         this.capabilities = capabilities;
     }
 
@@ -32,7 +31,7 @@ public class ExtensionCapabilities implements Capabilities {
         }
     }
 
-    private static String golangDuration(Duration duration) {
+    protected static String golangDuration(Duration duration) {
         return String.format("%dms", duration.toMillis());
     }
 
@@ -133,15 +132,8 @@ public class ExtensionCapabilities implements Capabilities {
     }
 
     @Override
-    @Nonnull
-    public Selenoid selenoid() {
-        return capabilities.selenoid();
-    }
-
-    @Override
-    @Nonnull
-    public Moon moon() {
-        return capabilities.moon();
+    public <T extends Capabilities> T extension(Class<T> cls) {
+        return capabilities.extension(cls);
     }
 
     @Nonnull
@@ -541,219 +533,6 @@ public class ExtensionCapabilities implements Capabilities {
             }
             String serializedProfile = encodeFileToBase64(zipDirectory(directory));
             firefoxOptions.profile(serializedProfile);
-            return this;
-        }
-    }
-
-    static class SelenoidCapabilities extends ExtensionCapabilities implements Capabilities.Selenoid {
-
-        private final SelenoidOptions selenoidOptions;
-
-        SelenoidCapabilities(Capabilities capabilities) {
-            super(capabilities);
-            this.selenoidOptions = new SelenoidOptions();
-            capabilities.capability(JSON_PROPERTY_SELENOID_COLON_OPTIONS, selenoidOptions);
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid enableLog() {
-            selenoidOptions.setEnableLog(true);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid enableVideo() {
-            selenoidOptions.setEnableVideo(true);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid enableVNC() {
-            selenoidOptions.setEnableVNC(true);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid environmentVariable(@Nonnull String key, @Nonnull String value) {
-            selenoidOptions.addEnvItem(String.format("%s=%s", key, value));
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid logName(@Nonnull String name) {
-            selenoidOptions.setLogName(name);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid name(@Nonnull String name) {
-            selenoidOptions.setName(name);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid screenResolution(@Nonnull String screenResolution) {
-            selenoidOptions.setScreenResolution(screenResolution);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid sessionTimeout(@Nonnull Duration duration) {
-            selenoidOptions.setSessionTimeout(ExtensionCapabilities.golangDuration(duration));
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid s3KeyPattern(@Nonnull String pattern) {
-            selenoidOptions.setS3KeyPattern(pattern);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid timeZone(@Nonnull String timeZone) {
-            selenoidOptions.setTimeZone(timeZone);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid videoFrameRate(int frameRate) {
-            selenoidOptions.setVideoFrameRate((long) frameRate);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid videoName(@Nonnull String videoName) {
-            selenoidOptions.setVideoName(videoName);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities.Selenoid videoScreenSize(@Nonnull String videoScreenSize) {
-            selenoidOptions.setVideoScreenSize(videoScreenSize);
-            return this;
-        }
-    }
-
-    static class MoonCapabilities extends ExtensionCapabilities implements Moon, Moon.MobileDevice {
-
-        private final MoonOptions moonOptions;
-        private final MoonMobileDevice moonMobileDevice;
-
-        MoonCapabilities(Capabilities capabilities) {
-            super(capabilities);
-            this.moonOptions = new MoonOptions();
-            this.moonMobileDevice = new MoonMobileDevice();
-            capabilities.capability(JSON_PROPERTY_MOON_COLON_OPTIONS, moonOptions);
-        }
-
-        @Nonnull
-        @Override
-        public Moon enableVNC() {
-            moonOptions.setEnableVNC(true);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon environmentVariable(@Nonnull String key, @Nonnull String value) {
-            moonOptions.addEnvItem(String.format("%s=%s", key, value));
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon logName(@Nonnull String name) {
-            moonOptions.setLogName(name);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon name(@Nonnull String name) {
-            moonOptions.setName(name);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon screenResolution(@Nonnull String screenResolution) {
-            moonOptions.setScreenResolution(screenResolution);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon sessionTimeout(@Nonnull Duration duration) {
-            moonOptions.setSessionTimeout(ExtensionCapabilities.golangDuration(duration));
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon s3KeyPattern(@Nonnull String pattern) {
-            moonOptions.setS3KeyPattern(pattern);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon timeZone(@Nonnull String timeZone) {
-            moonOptions.setTimeZone(timeZone);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon videoFrameRate(int frameRate) {
-            moonOptions.setVideoFrameRate((long) frameRate);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon videoName(@Nonnull String videoName) {
-            moonOptions.setVideoName(videoName);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public Moon videoScreenSize(@Nonnull String videoScreenSize) {
-            moonOptions.setVideoScreenSize(videoScreenSize);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public MobileDevice mobileDevice() {
-            moonOptions.setMobileDevice(moonMobileDevice);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public MobileDevice deviceName(@Nonnull String name) {
-            moonMobileDevice.setDeviceName(name);
-            return this;
-        }
-
-        @Nonnull
-        @Override
-        public MobileDevice landscape() {
-            moonMobileDevice.setOrientation(LANDSCAPE);
             return this;
         }
     }

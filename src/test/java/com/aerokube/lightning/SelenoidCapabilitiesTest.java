@@ -1,5 +1,6 @@
 package com.aerokube.lightning;
 
+import com.aerokube.lightning.extensions.Selenoid;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -18,7 +19,7 @@ public class SelenoidCapabilitiesTest extends BaseTest {
         test(
                 () -> Capabilities.create()
                         .browserName("chrome")
-                        .selenoid().environmentVariable("LANG", "en_US.UTF-8")
+                        .extension(Selenoid.class).environmentVariable("LANG", "en_US.UTF-8")
                         .enableVNC()
                         .enableVideo().videoName("my-video.mp4")
                         .videoScreenSize("1280x1024").videoFrameRate(24)

@@ -8,13 +8,18 @@ public class WebDriverException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public WebDriverException(@Nonnull Throwable e) {
-        super(e);
+    public WebDriverException(@Nonnull Throwable cause) {
+        super(cause);
         this.errorCode = ErrorCode.UNKNOWN_ERROR;
     }
 
     public WebDriverException(@Nonnull String message) {
         super(message);
+        this.errorCode = ErrorCode.UNKNOWN_ERROR;
+    }
+
+    public WebDriverException(@Nonnull String message, @Nonnull Throwable cause) {
+        super(message, cause);
         this.errorCode = ErrorCode.UNKNOWN_ERROR;
     }
 
