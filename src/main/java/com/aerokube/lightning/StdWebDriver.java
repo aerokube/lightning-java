@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.aerokube.lightning.FileUtils.encodeFileToBase64;
@@ -56,14 +55,12 @@ public class StdWebDriver implements WebDriver {
     public StdWebDriver(@Nullable String baseUri, @Nonnull Capabilities capabilities) {
         this(
                 baseUri, capabilities,
-                apiClient -> apiClient.setHttpClientBuilder(
-                        HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
-                )
+                HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
         );
     }
 
-    public StdWebDriver(@Nullable String baseUri, @Nonnull Capabilities capabilities, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
-        initApiClient(baseUri, apiClientConfigurator);
+    public StdWebDriver(@Nullable String baseUri, @Nonnull Capabilities capabilities, @Nonnull HttpClient.Builder httpClientBuilder) {
+        initApiClient(baseUri, httpClientBuilder);
 
         actionsApi = new ActionsApi(apiClient);
         contextsApi = new ContextsApi(apiClient);
@@ -110,8 +107,8 @@ public class StdWebDriver implements WebDriver {
         this.frames = new Frames(this);
     }
 
-    private void initApiClient(@Nullable String baseUri, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
-        apiClientConfigurator.accept(apiClient);
+    private void initApiClient(@Nullable String baseUri, @Nonnull HttpClient.Builder httpClientBuilder) {
+        apiClient.setHttpClientBuilder(httpClientBuilder);
         if (baseUri != null) {
             if (baseUri.endsWith("/")) {
                 baseUri = baseUri.substring(0, baseUri.length() - 1);

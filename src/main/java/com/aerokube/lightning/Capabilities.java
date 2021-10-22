@@ -64,11 +64,7 @@ public interface Capabilities {
     @Nonnull
     Opera opera();
 
-    @Nonnull
-    Selenoid selenoid();
-
-    @Nonnull
-    Moon moon();
+    <T extends Capabilities> T extension(Class<T> cls);
 
     @Nonnull
     Safari safari();
@@ -240,56 +236,6 @@ public interface Capabilities {
 
     }
 
-    interface Moon extends Capabilities {
-
-        @Nonnull
-        Moon enableVNC();
-
-        @Nonnull
-        Moon environmentVariable(@Nonnull String key, @Nonnull String value);
-
-        @Nonnull
-        Moon logName(@Nonnull String name);
-
-        @Nonnull
-        Moon name(@Nonnull String name);
-
-        @Nonnull
-        Moon screenResolution(@Nonnull String screenResolution);
-
-        @Nonnull
-        Moon sessionTimeout(@Nonnull Duration duration);
-
-        @Nonnull
-        Moon s3KeyPattern(@Nonnull String pattern);
-
-        @Nonnull
-        Moon timeZone(@Nonnull String timeZone);
-
-        @Nonnull
-        Moon videoFrameRate(int frameRate);
-
-        @Nonnull
-        Moon videoName(@Nonnull String videoName);
-
-        @Nonnull
-        Moon videoScreenSize(@Nonnull String videoScreenSize);
-
-        @Nonnull
-        MobileDevice mobileDevice();
-
-        interface MobileDevice extends Capabilities {
-
-            @Nonnull
-            MobileDevice deviceName(@Nonnull String name);
-
-            @Nonnull
-            MobileDevice landscape();
-
-        }
-
-    }
-
     interface Opera extends Capabilities {
 
         @Nonnull
@@ -300,49 +246,6 @@ public interface Capabilities {
 
         @Nonnull
         Opera extensions(@Nonnull Path... extension);
-
-    }
-
-    interface Selenoid extends Capabilities {
-
-        @Nonnull
-        Selenoid enableLog();
-
-        @Nonnull
-        Selenoid enableVideo();
-
-        @Nonnull
-        Selenoid enableVNC();
-
-        @Nonnull
-        Selenoid environmentVariable(@Nonnull String key, @Nonnull String value);
-
-        @Nonnull
-        Selenoid logName(@Nonnull String name);
-
-        @Nonnull
-        Selenoid name(@Nonnull String name);
-
-        @Nonnull
-        Selenoid screenResolution(@Nonnull String screenResolution);
-
-        @Nonnull
-        Selenoid sessionTimeout(@Nonnull Duration duration);
-
-        @Nonnull
-        Selenoid s3KeyPattern(@Nonnull String pattern);
-
-        @Nonnull
-        Selenoid timeZone(@Nonnull String timeZone);
-
-        @Nonnull
-        Selenoid videoFrameRate(int frameRate);
-
-        @Nonnull
-        Selenoid videoName(@Nonnull String videoName);
-
-        @Nonnull
-        Selenoid videoScreenSize(@Nonnull String videoScreenSize);
 
     }
 

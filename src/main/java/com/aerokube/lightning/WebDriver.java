@@ -4,11 +4,11 @@ import com.aerokube.lightning.model.LocatorStrategy;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public interface WebDriver {
 
@@ -18,8 +18,8 @@ public interface WebDriver {
     }
 
     @Nonnull
-    static WebDriver create(@Nonnull String baseUri, @Nonnull Capabilities capabilities, @Nonnull Consumer<ApiClient> apiClientConfigurator) {
-        return new StdWebDriver(baseUri, capabilities, apiClientConfigurator);
+    static WebDriver create(@Nonnull String baseUri, @Nonnull Capabilities capabilities, @Nonnull HttpClient.Builder httpClientBuilder) {
+        return new StdWebDriver(baseUri, capabilities, httpClientBuilder);
     }
 
     @Nonnull
