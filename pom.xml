@@ -10,6 +10,7 @@
 
     <name>Lightning</name>
     <description>Lightweight and lightning fast WebDriver client library</description>
+    <url>https://github.com/aerokube/lightning-java</url>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -236,5 +237,20 @@
         <system>Github Actions</system>
         <url>https://github.com/aerokube/lightning-java/actions</url>
     </ciManagement>
+
+    <developers>
+        <developer>
+            <id>vania-pooh</id>
+            <name>Ivan Krutov</name>
+            <email>vania-pooh@aerokube.com</email>
+            <organization>Aerokube</organization>
+        </developer>
+        <developer>
+            <id>aandryashin</id>
+            <name>Alexander Andryashin</name>
+            <email>aandryashin@aerokube.com</email>
+            <organization>Aerokube</organization>
+        </developer>
+    </developers>
 
 </project>
