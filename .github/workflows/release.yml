@@ -1,8 +1,12 @@
 name: release
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Release version"
+        required: true
+        default: "X.Y.Z"
 
 jobs:
   lightning-java:
@@ -22,9 +26,6 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSWORD
 
-      - name: Prepare release version
-        run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
-
       - name: Deploy release
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -33,9 +34,11 @@ jobs:
         run: |
           git config user.name $GITHUB_REPOSITORY
           git config user.email "aerokube@aerokube.github.com"
-          mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$RELEASE_VERSION
-          git commit -am "Updated version to $RELEASE_VERSION"
+          mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ github.event.inputs.releaseVersion }}
+          git commit -am "Updated version to ${{ github.event.inputs.releaseVersion }}"
           git push origin master
+          git tag ${{ github.event.inputs.releaseVersion }}
+          git push origin ${{ github.event.inputs.releaseVersion }}
           mvn clean deploy -P release
           mvn versions:set -DgenerateBackupPoms=false -DnextSnapshot=true
           git commit -am "Updated version to next snapshot"
