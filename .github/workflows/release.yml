@@ -35,6 +35,7 @@ jobs:
           git config user.email "aerokube@aerokube.github.com"
           mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$RELEASE_VERSION
           git commit -am "Updated version to $RELEASE_VERSION"
+          git push origin master
           mvn clean deploy -P release
           mvn versions:set -DgenerateBackupPoms=false -DnextSnapshot=true
           git commit -am "Updated version to next snapshot"
