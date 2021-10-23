@@ -6,7 +6,7 @@
 
     <groupId>com.aerokube.lightning</groupId>
     <artifactId>lightning</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>Lightning</name>
     <description>Lightweight and lightning fast WebDriver client library</description>
