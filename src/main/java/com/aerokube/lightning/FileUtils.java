@@ -11,7 +11,7 @@ import java.util.zip.ZipOutputStream;
 
 public final class FileUtils {
 
-    static Path zipFile(Path file) {
+    public static Path zipFile(Path file) {
         try {
             Path zipPath = Files.createTempFile("lightning", "");
             try (ZipOutputStream zs = new ZipOutputStream(Files.newOutputStream(zipPath))) {
@@ -64,7 +64,7 @@ public final class FileUtils {
         }
     }
 
-    static String encodeFileToBase64(Path path) {
+    public static String encodeFileToBase64(Path path) {
         try {
             return Base64.getEncoder().encodeToString(Files.readAllBytes(path));
         } catch (IOException e) {

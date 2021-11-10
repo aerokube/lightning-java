@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -117,7 +118,8 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    private <T> T execute(Callable<T> action) {
+    @Override
+    public <T> T execute(@Nonnull Callable<T> action) {
         try {
             return action.call();
         } catch (ApiException e) {
@@ -165,6 +167,28 @@ public class StdWebDriver implements WebDriver {
     @Override
     public Capabilities getCapabilities() {
         return capabilities;
+    }
+
+    @Nonnull
+    @Override
+    public <T extends WebDriver> T extension(@Nonnull Class<T> cls) {
+        try {
+            Constructor<T> constructor = cls.getConstructor(WebDriver.class);
+            return constructor.newInstance(this);
+        } catch (Exception e) {
+            throw new WebDriverException(String.format("Failed to initialize extension %s", cls.getCanonicalName()), e);
+        }
+    }
+
+    @Nonnull
+    @Override
+    public <T> T api(@Nonnull Class<T> cls) {
+        try {
+            Constructor<T> constructor = cls.getConstructor(ApiClient.class);
+            return constructor.newInstance(apiClient);
+        } catch (Exception e) {
+            throw new WebDriverException(String.format("Failed to initialize api %s", cls.getCanonicalName()), e);
+        }
     }
 
     @Nonnull
@@ -268,100 +292,7 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    static class WebDriverDelegate implements WebDriver {
-
-        private final WebDriver webDriver;
-
-        WebDriverDelegate(WebDriver webDriver) {
-            this.webDriver = webDriver;
-        }
-
-        @Override
-        @Nonnull
-        public Session session() {
-            return webDriver.session();
-        }
-
-        @Override
-        @Nonnull
-        public Actions actions() {
-            return webDriver.actions();
-        }
-
-        @Override
-        @Nonnull
-        public Cookies cookies() {
-            return webDriver.cookies();
-        }
-
-        @Override
-        @Nonnull
-        public Elements elements() {
-            return webDriver.elements();
-        }
-
-        @Override
-        @Nonnull
-        public Windows windows() {
-            return webDriver.windows();
-        }
-
-        @Override
-        @Nonnull
-        public Frames frames() {
-            return webDriver.frames();
-        }
-
-        @Override
-        @Nonnull
-        public Document document() {
-            return webDriver.document();
-        }
-
-        @Override
-        @Nonnull
-        public Navigation navigation() {
-            return webDriver.navigation();
-        }
-
-        @Override
-        @Nonnull
-        public Prompts prompts() {
-            return webDriver.prompts();
-        }
-
-        @Override
-        @Nonnull
-        public Print print() {
-            return webDriver.print();
-        }
-
-        @Override
-        @Nonnull
-        public Screenshot screenshot() {
-            return webDriver.screenshot();
-        }
-
-        @Override
-        @Nonnull
-        public Timeouts timeouts() {
-            return webDriver.timeouts();
-        }
-
-        @Override
-        @Nonnull
-        public String getSessionId() {
-            return webDriver.getSessionId();
-        }
-
-        @Nonnull
-        @Override
-        public Capabilities getCapabilities() {
-            return webDriver.getCapabilities();
-        }
-    }
-
-    class Cookies extends WebDriverDelegate implements WebDriver.Cookies {
+    class Cookies extends WebDriverExtension implements WebDriver.Cookies {
 
         Cookies(WebDriver webDriver) {
             super(webDriver);
@@ -409,7 +340,7 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Actions extends WebDriverDelegate implements WebDriver.Actions {
+    class Actions extends WebDriverExtension implements WebDriver.Actions {
 
         Actions(WebDriver webDriver) {
             super(webDriver);
@@ -423,7 +354,7 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Document extends WebDriverDelegate implements WebDriver.Document {
+    class Document extends WebDriverExtension implements WebDriver.Document {
 
         Document(WebDriver webDriver) {
             super(webDriver);
@@ -477,7 +408,7 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Prompts extends WebDriverDelegate implements WebDriver.Prompts {
+    class Prompts extends WebDriverExtension implements WebDriver.Prompts {
 
         Prompts(WebDriver webDriver) {
             super(webDriver);
@@ -514,7 +445,7 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Session extends WebDriverDelegate implements WebDriver.Session {
+    class Session extends WebDriverExtension implements WebDriver.Session {
 
         Session(WebDriver webDriver) {
             super(webDriver);
@@ -547,7 +478,7 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Navigation extends WebDriverDelegate implements WebDriver.Navigation {
+    class Navigation extends WebDriverExtension implements WebDriver.Navigation {
 
         Navigation(WebDriver webDriver) {
             super(webDriver);
@@ -598,7 +529,7 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Screenshot extends WebDriverDelegate implements WebDriver.Screenshot {
+    class Screenshot extends WebDriverExtension implements WebDriver.Screenshot {
 
         Screenshot(WebDriver webDriver) {
             super(webDriver);
@@ -622,7 +553,7 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Timeouts extends WebDriverDelegate implements WebDriver.Timeouts {
+    class Timeouts extends WebDriverExtension implements WebDriver.Timeouts {
 
         Timeouts(WebDriver webDriver) {
             super(webDriver);
@@ -695,7 +626,7 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Windows extends WebDriverDelegate implements WebDriver.Windows {
+    class Windows extends WebDriverExtension implements WebDriver.Windows {
 
         Windows(WebDriver webDriver) {
             super(webDriver);
@@ -817,7 +748,7 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Frames extends WebDriverDelegate implements WebDriver.Frames {
+    class Frames extends WebDriverExtension implements WebDriver.Frames {
 
         Frames(WebDriver webDriver) {
             super(webDriver);
@@ -850,7 +781,7 @@ public class StdWebDriver implements WebDriver {
         }
     }
 
-    class Elements extends WebDriverDelegate implements WebDriver.Elements {
+    class Elements extends WebDriverExtension implements WebDriver.Elements {
 
         Elements(WebDriver webDriver) {
             super(webDriver);
@@ -1023,7 +954,7 @@ public class StdWebDriver implements WebDriver {
 
     }
 
-    class Print extends WebDriverDelegate implements WebDriver.Print {
+    class Print extends WebDriverExtension implements WebDriver.Print {
 
         private final PrintRequestOptions printRequestOptions = new PrintRequestOptions()
                 .page(new PrintRequestOptionsPage())

@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 public interface WebDriver {
 
@@ -64,6 +65,14 @@ public interface WebDriver {
 
     @Nonnull
     Capabilities getCapabilities();
+
+    @Nonnull
+    <T extends WebDriver> T extension(@Nonnull Class<T> cls);
+
+    @Nonnull
+    <T> T api(@Nonnull Class<T> cls);
+
+    <T> T execute(@Nonnull Callable<T> action);
 
     interface Actions extends WebDriver {
 
