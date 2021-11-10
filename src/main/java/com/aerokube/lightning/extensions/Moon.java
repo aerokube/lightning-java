@@ -6,8 +6,10 @@ import com.aerokube.lightning.model.MoonMobileDevice;
 import com.aerokube.lightning.model.MoonOptions;
 
 import javax.annotation.Nonnull;
+import java.nio.file.Path;
 import java.time.Duration;
 
+import static com.aerokube.lightning.extensions.Selenoid.rootCAEnv;
 import static com.aerokube.lightning.model.Capabilities.JSON_PROPERTY_MOON_COLON_OPTIONS;
 import static com.aerokube.lightning.model.MoonMobileDevice.OrientationEnum.LANDSCAPE;
 
@@ -104,6 +106,12 @@ public class Moon extends ExtensionCapabilities implements MobileDevice {
     @Nonnull
     public MobileDevice landscape() {
         moonMobileDevice.setOrientation(LANDSCAPE);
+        return this;
+    }
+
+    @Nonnull
+    public Moon rootCertificationAuthority(@Nonnull Path certificate) {
+        moonOptions.addEnvItem(rootCAEnv(certificate));
         return this;
     }
 

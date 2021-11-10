@@ -2,9 +2,11 @@ package com.aerokube.lightning.extensions;
 
 import com.aerokube.lightning.Capabilities;
 import com.aerokube.lightning.ExtensionCapabilities;
+import com.aerokube.lightning.FileUtils;
 import com.aerokube.lightning.model.SelenoidOptions;
 
 import javax.annotation.Nonnull;
+import java.nio.file.Path;
 import java.time.Duration;
 
 import static com.aerokube.lightning.model.Capabilities.JSON_PROPERTY_SELENOID_COLON_OPTIONS;
@@ -17,6 +19,17 @@ public class Selenoid extends ExtensionCapabilities {
         super(capabilities);
         this.selenoidOptions = new SelenoidOptions();
         capabilities.capability(JSON_PROPERTY_SELENOID_COLON_OPTIONS, selenoidOptions);
+    }
+
+    static String rootCAEnv(@Nonnull Path certificate) {
+        String variableName = String.format(
+                "ROOT_CA_%s",
+                certificate.getFileName().toString().toUpperCase()
+                        .replace(" ", "_")
+                        .replace("-", "_")
+                        .replace(".", "_")
+        );
+        return String.format("%s=%s", variableName, FileUtils.encodeFileToBase64(certificate));
     }
 
     @Nonnull
@@ -94,6 +107,12 @@ public class Selenoid extends ExtensionCapabilities {
     @Nonnull
     public Selenoid videoScreenSize(@Nonnull String videoScreenSize) {
         selenoidOptions.setVideoScreenSize(videoScreenSize);
+        return this;
+    }
+
+    @Nonnull
+    public Selenoid rootCertificationAuthority(@Nonnull Path certificate) {
+        selenoidOptions.addEnvItem(rootCAEnv(certificate));
         return this;
     }
 }

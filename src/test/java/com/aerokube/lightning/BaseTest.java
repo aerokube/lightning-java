@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import static com.aerokube.lightning.Image.CHROME;
 
 @Testcontainers
-class BaseTest {
+public class BaseTest {
 
     @Container
     protected final GenericContainer<?> browserContainer = new GenericContainer<>(DockerImageName.parse(getImage().getRef()))
