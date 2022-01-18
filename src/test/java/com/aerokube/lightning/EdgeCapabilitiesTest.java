@@ -20,7 +20,7 @@ public class EdgeCapabilitiesTest extends BaseTest {
     void testBasicCapabilities() {
         test(
                 () -> Capabilities.create()
-                        .edge().binary("/usr/bin/microsoft-edge-beta")
+                        .edge().binary("/usr/bin/microsoft-edge")
                         .args("no-sandbox"),
                 driver -> driver.navigation().navigate("https://example.com")
         );

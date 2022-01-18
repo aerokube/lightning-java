@@ -16,13 +16,13 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <swagger.version>1.6.2</swagger.version>
-        <openapi-spec.version>1.0.13</openapi-spec.version>
+        <swagger.version>1.6.4</swagger.version>
+        <openapi-spec.version>1.0.14</openapi-spec.version>
         <openapi-plugin.version>5.1.0</openapi-plugin.version>
-        <jackson.version>2.12.5</jackson.version>
-        <junit-jupiter.version>5.8.1</junit-jupiter.version>
+        <jackson.version>2.13.1</jackson.version>
+        <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <testcontainers.version>1.16.0</testcontainers.version>
+        <testcontainers.version>1.16.2</testcontainers.version>
         <slf4j-log4j12.version>1.7.32</slf4j-log4j12.version>
         <surefire-plugin.version>2.22.2</surefire-plugin.version>
         <source-plugin.version>3.2.1</source-plugin.version>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.1</version>
+            <version>0.2.2</version>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>

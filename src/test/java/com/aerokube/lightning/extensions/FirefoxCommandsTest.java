@@ -11,18 +11,14 @@ import static com.aerokube.lightning.Image.FIREFOX;
 import static com.aerokube.lightning.model.FirefoxContext.CHROME;
 import static com.aerokube.lightning.model.FirefoxContext.CONTENT;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
-public class FirefoxTest extends BaseTest {
+public class FirefoxCommandsTest extends BaseTest {
 
     @Override
     protected Image getImage() {
         return FIREFOX;
-    }
-
-    @Override
-    protected String getUri(int port) {
-        return String.format("http://localhost:%s/wd/hub", port);
     }
 
     @Test
@@ -36,13 +32,13 @@ public class FirefoxTest extends BaseTest {
                             .elements().findFirst(By.tagName("body"));
                     assertThat(body.getCssProperty("background-color"), equalTo("rgb(240, 240, 242)"));
 
-                    String addonId = driver.extension(Firefox.class).installAddon(extensionPath);
+                    String addonId = driver.extension(FirefoxCommands.class).installAddon(extensionPath);
                     body = driver
                             .navigation().refresh()
                             .elements().findFirst(By.tagName("body"));
                     assertThat(body.getCssProperty("background-color"), equalTo("rgb(0, 0, 0)"));
 
-                    driver.extension(Firefox.class).uninstallAddon(addonId);
+                    driver.extension(FirefoxCommands.class).uninstallAddon(addonId);
                     body = driver
                             .navigation().refresh()
                             .elements().findFirst(By.tagName("body"));
@@ -56,10 +52,10 @@ public class FirefoxTest extends BaseTest {
         test(
                 () -> Capabilities.create().firefox(),
                 driver -> {
-                    FirefoxContext context = driver.extension(Firefox.class).context();
+                    FirefoxContext context = driver.extension(FirefoxCommands.class).context();
                     assertThat(context, equalTo(CONTENT));
 
-                    FirefoxContext switchedContext = driver.extension(Firefox.class).context(CHROME)
+                    FirefoxContext switchedContext = driver.extension(FirefoxCommands.class).context(CHROME)
                             .context();
                     assertThat(switchedContext, equalTo(CHROME));
                 }
@@ -73,7 +69,7 @@ public class FirefoxTest extends BaseTest {
                 driver -> {
                     driver.navigation()
                             .navigate("https://example.com");
-                    byte[] screenshot = driver.extension(Firefox.class).fullScreenshot();
+                    byte[] screenshot = driver.extension(FirefoxCommands.class).fullScreenshot();
                     assertThat(screenshot.length, greaterThan(0));
                 }
         );
