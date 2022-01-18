@@ -24,6 +24,7 @@ public class BaseTest {
         return new GenericContainer<>(DockerImageName.parse(getImage().getRef()))
                 .withPrivilegedMode(true)
                 .withExposedPorts(4444)
+                .withSharedMemorySize(268435456L)
                 .waitingFor(new HttpWaitStrategy().forPort(4444).forPath("/status"));
     }
 
