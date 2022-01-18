@@ -13,11 +13,11 @@ import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.Base64;
 
-public class Firefox extends WebDriverExtension {
+public class FirefoxCommands extends WebDriverExtension {
 
     private final MozillaApi mozillaApi;
 
-    public Firefox(WebDriver webDriver) {
+    public FirefoxCommands(WebDriver webDriver) {
         super(webDriver);
         mozillaApi = api(MozillaApi.class);
     }
@@ -31,14 +31,14 @@ public class Firefox extends WebDriverExtension {
     }
 
     @Nonnull
-    public Firefox uninstallAddon(@Nonnull String id) {
+    public FirefoxCommands uninstallAddon(@Nonnull String id) {
         AddonUninstallRequest addonUninstallRequest = new AddonUninstallRequest().id(id);
         execute(() -> mozillaApi.uninstallAddon(getSessionId(), addonUninstallRequest));
         return this;
     }
 
     @Nonnull
-    public Firefox context(@Nonnull FirefoxContext context) {
+    public FirefoxCommands context(@Nonnull FirefoxContext context) {
         ContextRequest contextRequest = new ContextRequest().context(context);
         execute(() -> mozillaApi.setContext(getSessionId(), contextRequest));
         return this;

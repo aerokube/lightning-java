@@ -20,11 +20,6 @@ public class FirefoxCapabilitiesTest extends BaseTest {
         return FIREFOX;
     }
 
-    @Override
-    protected String getUri(int port) {
-        return String.format("http://localhost:%s/wd/hub", port);
-    }
-
     @Test
     void testBasicCapabilities() {
         test(
