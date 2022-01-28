@@ -1,11 +1,15 @@
 package com.aerokube.lightning.extensions;
 
+import com.aerokube.lightning.FileUtils;
 import com.aerokube.lightning.WebDriver;
+import com.aerokube.lightning.WebDriverException;
 import com.aerokube.lightning.WebDriverExtension;
 import com.aerokube.lightning.api.AerokubeApi;
-import com.aerokube.lightning.model.StringResponse;
+import com.aerokube.lightning.model.ClipboardData;
 
 import javax.annotation.Nonnull;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
 
@@ -19,20 +23,48 @@ public class MoonCommands extends WebDriverExtension {
     }
 
     @Nonnull
-    public MoonCommands updateClipboard(@Nonnull byte[] content) {
+    public MoonCommands updateClipboardText(@Nonnull String text) {
         execute(() -> {
-            String encodedContent = Base64.getEncoder().encodeToString(content);
-            aerokubeApi.updateClipboard(getSessionId(), new StringResponse().value(encodedContent));
+            aerokubeApi.updateClipboard(getSessionId(), new ClipboardData().value(text));
             return null;
         });
         return this;
     }
 
     @Nonnull
-    public byte[] getClipboard() {
+    public MoonCommands updateClipboardImage(@Nonnull Path image) {
+        execute(() -> {
+            String encodedImage = FileUtils.encodeFileToBase64(image);
+            aerokubeApi.updateClipboard(
+                    getSessionId(),
+                    new ClipboardData()
+                            .value(encodedImage)
+                            .media(ClipboardData.MediaEnum.IMAGE_PNG)
+            );
+            return null;
+        });
+        return this;
+    }
+
+    @Nonnull
+    public String getClipboardText() {
         return execute(() -> {
-            String encodedBytes = aerokubeApi.getClipboard(getSessionId()).getValue();
-            return Base64.getDecoder().decode(encodedBytes);
+            ClipboardData clipboard = aerokubeApi.getClipboard(getSessionId());
+            if (clipboard.getMedia() != null) {
+                throw new WebDriverException(String.format("Received non-text data from the clipboard: %s", clipboard.getMedia()));
+            }
+            return clipboard.getValue();
+        });
+    }
+
+    @Nonnull
+    public byte[] getClipboardImage() {
+        return execute(() -> {
+            ClipboardData clipboard = aerokubeApi.getClipboard(getSessionId());
+            if (clipboard.getMedia() == null || !ClipboardData.MediaEnum.IMAGE_PNG.equals(clipboard.getMedia())) {
+                throw new WebDriverException("Received non-image data from the clipboard");
+            }
+            return Base64.getDecoder().decode(clipboard.getValue().getBytes(StandardCharsets.UTF_8));
         });
     }
 
