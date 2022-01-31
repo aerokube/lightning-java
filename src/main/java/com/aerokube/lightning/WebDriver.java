@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-public interface WebDriver {
+public interface WebDriver extends AutoCloseable {
 
     @Nonnull
     static WebDriver create(@Nonnull String baseUri, @Nonnull Capabilities capabilities) {
@@ -21,6 +21,10 @@ public interface WebDriver {
     @Nonnull
     static WebDriver create(@Nonnull String baseUri, @Nonnull Capabilities capabilities, @Nonnull HttpClient.Builder httpClientBuilder) {
         return new StdWebDriver(baseUri, capabilities, httpClientBuilder);
+    }
+
+    default void close(){
+        session().delete();
     }
 
     @Nonnull
