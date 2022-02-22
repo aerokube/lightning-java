@@ -6,19 +6,17 @@ import com.aerokube.lightning.model.MoonMobileDevice;
 import com.aerokube.lightning.model.MoonOptions;
 
 import javax.annotation.Nonnull;
-import java.nio.file.Path;
 import java.time.Duration;
 
-import static com.aerokube.lightning.extensions.Selenoid.rootCAEnv;
 import static com.aerokube.lightning.model.Capabilities.JSON_PROPERTY_MOON_COLON_OPTIONS;
 import static com.aerokube.lightning.model.MoonMobileDevice.OrientationEnum.LANDSCAPE;
 
-public class Moon extends ExtensionCapabilities implements MobileDevice {
+public class MoonCapabilities extends ExtensionCapabilities implements MobileDevice {
 
     private final MoonOptions moonOptions;
     private final MoonMobileDevice moonMobileDevice;
 
-    public Moon(@Nonnull Capabilities capabilities) {
+    public MoonCapabilities(@Nonnull Capabilities capabilities) {
         super(capabilities);
         this.moonOptions = new MoonOptions();
         this.moonMobileDevice = new MoonMobileDevice();
@@ -26,67 +24,78 @@ public class Moon extends ExtensionCapabilities implements MobileDevice {
     }
 
     @Nonnull
-    public Moon enableVNC() {
-        moonOptions.setEnableVNC(true);
+    public MoonCapabilities enableVideo() {
+        moonOptions.enableVideo(true);
         return this;
     }
 
     @Nonnull
-    public Moon environmentVariable(@Nonnull String key, @Nonnull String value) {
+    public MoonCapabilities environmentVariable(@Nonnull String key, @Nonnull String value) {
         moonOptions.addEnvItem(String.format("%s=%s", key, value));
         return this;
     }
 
     @Nonnull
-    public Moon logName(@Nonnull String name) {
-        moonOptions.setLogName(name);
+    public MoonCapabilities label(@Nonnull String key, @Nonnull String value) {
+        moonOptions.putLabelsItem(key, value);
         return this;
     }
 
     @Nonnull
-    public Moon name(@Nonnull String name) {
+    public MoonCapabilities name(@Nonnull String name) {
         moonOptions.setName(name);
         return this;
     }
 
     @Nonnull
-    public Moon screenResolution(@Nonnull String screenResolution) {
+    public MoonCapabilities nameserver(@Nonnull String nameserver) {
+        moonOptions.addNameserversItem(nameserver);
+        return this;
+    }
+
+    @Nonnull
+    public MoonCapabilities host(@Nonnull String domainName, @Nonnull String ipAddress) {
+        moonOptions.addHostsItem(String.format("%s:%s", domainName, ipAddress));
+        return this;
+    }
+
+    @Nonnull
+    public MoonCapabilities screenResolution(@Nonnull String screenResolution) {
         moonOptions.setScreenResolution(screenResolution);
         return this;
     }
 
     @Nonnull
-    public Moon sessionTimeout(@Nonnull Duration duration) {
+    public MoonCapabilities sessionTimeout(@Nonnull Duration duration) {
         moonOptions.setSessionTimeout(ExtensionCapabilities.golangDuration(duration));
         return this;
     }
 
     @Nonnull
-    public Moon s3KeyPattern(@Nonnull String pattern) {
-        moonOptions.setS3KeyPattern(pattern);
+    public MoonCapabilities pattern(@Nonnull String pattern) {
+        moonOptions.setPattern(pattern);
         return this;
     }
 
     @Nonnull
-    public Moon timeZone(@Nonnull String timeZone) {
-        moonOptions.setTimeZone(timeZone);
-        return this;
+    public MoonCapabilities timeZone(@Nonnull String timeZone) {
+        return environmentVariable("TZ", timeZone);
     }
 
     @Nonnull
-    public Moon videoFrameRate(int frameRate) {
+    public MoonCapabilities videoFrameRate(int frameRate) {
         moonOptions.setVideoFrameRate((long) frameRate);
         return this;
     }
 
     @Nonnull
-    public Moon videoName(@Nonnull String videoName) {
+    public MoonCapabilities videoName(@Nonnull String videoName) {
         moonOptions.setVideoName(videoName);
         return this;
     }
 
     @Nonnull
-    public Moon videoScreenSize(@Nonnull String videoScreenSize) {
+    public MoonCapabilities videoScreenSize(@Nonnull String videoScreenSize) {
         moonOptions.setVideoScreenSize(videoScreenSize);
         return this;
     }
@@ -106,12 +115,6 @@ public class Moon extends ExtensionCapabilities implements MobileDevice {
     @Nonnull
     public MobileDevice landscape() {
         moonMobileDevice.setOrientation(LANDSCAPE);
-        return this;
-    }
-
-    @Nonnull
-    public Moon rootCertificationAuthority(@Nonnull Path certificate) {
-        moonOptions.addEnvItem(rootCAEnv(certificate));
         return this;
     }
 

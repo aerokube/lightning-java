@@ -17,7 +17,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <swagger.version>1.6.4</swagger.version>
-        <openapi-spec.version>1.0.15</openapi-spec.version>
+        <openapi-spec.version>1.1.1</openapi-spec.version>
         <openapi-plugin.version>5.1.0</openapi-plugin.version>
         <jackson.version>2.13.1</jackson.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
