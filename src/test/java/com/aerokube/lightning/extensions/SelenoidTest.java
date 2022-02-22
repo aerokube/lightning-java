@@ -27,7 +27,7 @@ public class SelenoidTest extends BaseTest {
         test(
                 () -> Capabilities.create()
                         .firefox()
-                        .extension(Selenoid.class).rootCertificationAuthority(certPath),
+                        .extension(SelenoidCapabilities.class).rootCertificationAuthority(certPath),
                 driver -> {
                     String url = driver.navigation().navigate("https://self-signed.badssl.com/")
                             .getUrl();
