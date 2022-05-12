@@ -16,14 +16,15 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <swagger.version>1.6.4</swagger.version>
+        <swagger.version>1.6.6</swagger.version>
         <openapi-spec.version>1.1.2</openapi-spec.version>
         <openapi-plugin.version>5.1.0</openapi-plugin.version>
-        <jackson.version>2.13.1</jackson.version>
+        <jackson-databind.version>2.13.2.2</jackson-databind.version>
+        <jackson-datatype.version>2.13.2</jackson-datatype.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <testcontainers.version>1.16.2</testcontainers.version>
-        <slf4j-log4j12.version>1.7.32</slf4j-log4j12.version>
+        <testcontainers.version>1.17.1</testcontainers.version>
+        <slf4j-log4j12.version>1.7.36</slf4j-log4j12.version>
         <surefire-plugin.version>2.22.2</surefire-plugin.version>
         <source-plugin.version>3.2.1</source-plugin.version>
         <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
@@ -35,12 +36,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson-databind.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson-datatype.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
