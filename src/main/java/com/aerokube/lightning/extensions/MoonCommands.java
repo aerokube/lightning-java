@@ -9,6 +9,7 @@ import com.aerokube.lightning.model.ClipboardData;
 
 import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
@@ -75,10 +76,7 @@ public class MoonCommands extends WebDriverExtension {
 
     @Nonnull
     public byte[] downloadFile(@Nonnull String file) {
-        return execute(() -> {
-            String encodedBytes = aerokubeApi.downloadRemoteFile(getSessionId(), file).getValue();
-            return Base64.getDecoder().decode(encodedBytes);
-        });
+        return execute(() -> Files.readAllBytes(aerokubeApi.downloadRemoteFile(getSessionId(), file).toPath()));
     }
 
     @Nonnull
