@@ -31,4 +31,6 @@ public interface Window {
     @Nonnull
     Window switchTo();
 
+    @Nonnull
+    String getHandle();
 }

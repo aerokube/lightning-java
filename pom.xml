@@ -5,135 +5,76 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.aerokube.lightning</groupId>
-    <artifactId>lightning</artifactId>
+    <artifactId>lightning-parent</artifactId>
     <version>1.2.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>Lightning</name>
-    <description>Lightweight and lightning fast WebDriver client library</description>
+    <name>Lightning Parent</name>
+    <description>Lightweight and lightning fast WebDriver client library for Java and related components</description>
     <url>https://github.com/aerokube/lightning-java</url>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <swagger.version>1.6.6</swagger.version>
-        <openapi-spec.version>1.1.2</openapi-spec.version>
-        <openapi-plugin.version>5.1.0</openapi-plugin.version>
-        <jackson-databind.version>2.13.3</jackson-databind.version>
-        <jackson-datatype.version>2.13.3</jackson-datatype.version>
-        <junit-jupiter.version>5.8.2</junit-jupiter.version>
-        <hamcrest.version>2.2</hamcrest.version>
-        <testcontainers.version>1.17.1</testcontainers.version>
-        <slf4j-log4j12.version>1.7.36</slf4j-log4j12.version>
         <surefire-plugin.version>2.22.2</surefire-plugin.version>
         <source-plugin.version>3.2.1</source-plugin.version>
         <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
         <gpg-plugin.version>3.0.1</gpg-plugin.version>
         <nexus-plugin.version>1.6.8</nexus-plugin.version>
+        <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <hamcrest.version>2.2</hamcrest.version>
+        <testcontainers.version>1.17.1</testcontainers.version>
+        <slf4j-log4j12.version>1.7.36</slf4j-log4j12.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson-databind.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson-datatype.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <version>${hamcrest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.lightbody.bmp</groupId>
-            <artifactId>browsermob-core</artifactId>
-            <version>2.1.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-log4j12.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>lightning</module>
+        <module>lightning-adapter</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.aerokube.lightning</groupId>
+                <artifactId>lightning</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>${hamcrest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j-log4j12.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>${openapi-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <modelPackage>com.aerokube.lightning.model</modelPackage>
-                            <apiPackage>com.aerokube.lightning.api</apiPackage>
-                            <inputSpec>https://github.com/aerokube/selenium-openapi/releases/download/${openapi-spec.version}/selenium.yaml</inputSpec>
-                            <generatorName>java</generatorName>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModelTests>false</generateModelTests>
-                            <generateAliasAsModel>true</generateAliasAsModel>
-                            <enablePostProcessFile>true</enablePostProcessFile>
-                            <library>native</library>
-                            <configOptions>
-                                <dateLibrary>java8</dateLibrary>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
