@@ -744,6 +744,12 @@ public class StdWebDriver implements WebDriver {
                 execute(() -> contextsApi.switchToWindow(sessionId, switchToWindowRequest));
                 return this;
             }
+
+            @Nonnull
+            @Override
+            public String getHandle() {
+                return handle;
+            }
         }
 
     }
@@ -931,6 +937,12 @@ public class StdWebDriver implements WebDriver {
                 ElementSendKeysRequest elementSendKeysRequest = new ElementSendKeysRequest().text(text);
                 execute(() -> elementsApi.elementSendKeys(sessionId, id, elementSendKeysRequest));
                 return this;
+            }
+
+            @Nonnull
+            @Override
+            public byte[] takeScreenshot() {
+                return screenshot.take(this);
             }
 
             @Nonnull

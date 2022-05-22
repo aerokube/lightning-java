@@ -52,6 +52,9 @@ public interface WebElement {
     WebElement sendKeys(@Nonnull String text);
 
     @Nonnull
+    byte[] takeScreenshot();
+
+    @Nonnull
     Accessibility accessibility();
 
     interface Accessibility {
