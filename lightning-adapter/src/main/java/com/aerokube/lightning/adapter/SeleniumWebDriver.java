@@ -39,6 +39,7 @@ public class SeleniumWebDriver implements WebDriver, WebDriver.Options, WebDrive
         }
     }
 
+    @Nonnull
     private static WebDriverException processException(com.aerokube.lightning.WebDriverException e) {
         switch (e.getErrorCode()) {
             case ELEMENT_CLICK_INTERCEPTED:
@@ -89,6 +90,7 @@ public class SeleniumWebDriver implements WebDriver, WebDriver.Options, WebDrive
         return new WebDriverException(e.getMessage(), e);
     }
 
+    @Nonnull
     static com.aerokube.lightning.WebDriver.Locator byToLocator(By by) {
         if (by instanceof By.Remotable) {
             By.Remotable.Parameters remoteParameters = ((By.Remotable) by).getRemoteParameters();
@@ -123,6 +125,11 @@ public class SeleniumWebDriver implements WebDriver, WebDriver.Options, WebDrive
             date = Date.from(expires.get());
         }
         return new Cookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), date, cookie.isSecureOnly(), cookie.isHttpOnly(), cookie.getSameSitePolicy().getValue());
+    }
+
+    @Nonnull
+    public String getSessionId() {
+        return webDriver.getSessionId();
     }
 
     @Override
