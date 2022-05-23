@@ -15,7 +15,7 @@ Lightning motivation is described in our [blog article](https://blog.aerokube.co
     <dependency>
         <groupId>com.aerokube.lightning</groupId>
         <artifactId>lightning</artifactId>
-        <version>1.2.1</version>
+        <version>1.3.0</version>
     </dependency>
     ```
 
