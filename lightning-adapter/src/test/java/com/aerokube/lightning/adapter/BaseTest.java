@@ -1,6 +1,7 @@
 package com.aerokube.lightning.adapter;
 
 import com.aerokube.lightning.Capabilities;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
@@ -12,6 +13,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static com.aerokube.lightning.WebDriver.create;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @Testcontainers
 public class BaseTest {
@@ -39,7 +42,9 @@ public class BaseTest {
         WebDriver driver = null;
         try {
             Integer port = browserContainer.getMappedPort(4444);
-            driver = new SeleniumWebDriver(create(getUri(port), caps.get()));
+            SeleniumWebDriver seleniumWebDriver = new SeleniumWebDriver(create(getUri(port), caps.get()));
+            assertThat(seleniumWebDriver.getSessionId(), not(emptyString()));
+            driver = seleniumWebDriver;
             steps.accept(driver);
         } finally {
             if (driver != null) {
