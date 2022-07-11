@@ -2,8 +2,7 @@ package com.aerokube.lightning.extensions;
 
 import com.aerokube.lightning.Capabilities;
 import com.aerokube.lightning.ExtensionCapabilities;
-import com.aerokube.lightning.model.MoonMobileDevice;
-import com.aerokube.lightning.model.MoonOptions;
+import com.aerokube.lightning.model.*;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
@@ -24,6 +23,18 @@ public class MoonCapabilities extends ExtensionCapabilities implements MobileDev
     }
 
     @Nonnull
+    public MoonCapabilities additionalFonts() {
+        moonOptions.additionalFonts(true);
+        return this;
+    }
+
+    @Nonnull
+    public MoonCapabilities context(String context) {
+        moonOptions.context(context);
+        return this;
+    }
+
+    @Nonnull
     public MoonCapabilities enableVideo() {
         moonOptions.enableVideo(true);
         return this;
@@ -38,6 +49,18 @@ public class MoonCapabilities extends ExtensionCapabilities implements MobileDev
     @Nonnull
     public MoonCapabilities label(@Nonnull String key, @Nonnull String value) {
         moonOptions.putLabelsItem(key, value);
+        return this;
+    }
+
+    @Nonnull
+    public MoonCapabilities logLevel(ChromiumLogLevel logLevel) {
+        moonOptions.logLevel(new MoonLogLevel(logLevel));
+        return this;
+    }
+
+    @Nonnull
+    public MoonCapabilities logLevel(FirefoxLogLevel logLevel) {
+        moonOptions.logLevel(new MoonLogLevel(logLevel));
         return this;
     }
 
