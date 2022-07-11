@@ -17,7 +17,7 @@
 
     <properties>
         <swagger.version>1.6.6</swagger.version>
-        <openapi-spec.version>1.1.2</openapi-spec.version>
+        <openapi-spec.version>1.1.3</openapi-spec.version>
         <openapi-plugin.version>5.1.0</openapi-plugin.version>
         <jackson-databind.version>2.13.3</jackson-databind.version>
         <jackson-datatype.version>2.13.3</jackson-datatype.version>
