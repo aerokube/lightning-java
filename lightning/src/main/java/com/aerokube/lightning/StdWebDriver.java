@@ -401,7 +401,7 @@ public class StdWebDriver implements WebDriver {
             return execute(() -> {
                 String encodedFile = encodeFileToBase64(zipFile(file));
                 FileUploadRequest fileUploadRequest = new FileUploadRequest()
-                        .file(encodedFile);
+                        ._file(encodedFile);
                 return documentApi.uploadFile(sessionId, fileUploadRequest).getValue();
             });
         }

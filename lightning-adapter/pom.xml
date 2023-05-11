@@ -16,7 +16,7 @@
     <description>Adapter classes to use Lightning with existing Selenium tests</description>
 
     <properties>
-        <selenium-api.version>4.1.4</selenium-api.version>
+        <selenium-api.version>4.9.0</selenium-api.version>
     </properties>
 
     <dependencies>

@@ -398,11 +398,6 @@ public class SeleniumWebDriver implements WebDriver, WebDriver.Options, WebDrive
     }
 
     @Override
-    public ImeHandler ime() {
-        throw new UnsupportedOperationException("IME is not supported");
-    }
-
-    @Override
     public Window window() {
         return this;
     }
